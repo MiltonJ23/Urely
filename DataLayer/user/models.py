@@ -41,6 +41,3 @@ class Appointments(models.Model):
         return f"{self.user.name} - {self.clinic.name} on {self.date}"
 
 
-class User(models.Model):
-    username = models.CharField(max_length=150)
-    email = models.EmailField()
