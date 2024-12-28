@@ -19,13 +19,11 @@ This guide provides the setup instructions for the **UI Layer**, **Domain Layer*
    ```bash
    npm i --legacy-peer-deps
    ```
-  ```
 
 3. **Start the Development Server**:
    ```bash
    npm start
    ```
-  ```
 
 ---
 
