@@ -16,7 +16,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
 
-class User(AbstractBaseUser, PermissionsMixin):
+class UserAccount(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
@@ -35,7 +35,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 # HealthLogs Model
 class HealthLogs(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     activity_type = models.CharField(max_length=100)
     value = models.DecimalField(max_digits=5, decimal_places=2)
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -55,7 +55,7 @@ class Clinics(models.Model):
 
 # Appointments Model
 class Appointments(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     clinic = models.ForeignKey(Clinics, on_delete=models.CASCADE)
     date = models.DateTimeField()
     status = models.CharField(max_length=50)
