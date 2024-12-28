@@ -37,6 +37,8 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
+    'rest_framework',
+    'rest_framework_simplejwt.token_blacklist',
     'user',
 ]
 
@@ -100,6 +102,41 @@ AUTH_PASSWORD_VALIDATORS = [
     },
 ]
 
+REST_FRAMEWORK = {
+    # Authentication Classes
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',  # JWT Authentication
+    ],
+
+    # Permission Classes
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',  # Requires authentication by default
+    ],
+
+    # Parsers (for processing incoming data)
+    'DEFAULT_PARSER_CLASSES': [
+        'rest_framework.parsers.JSONParser',  # Parses JSON requests
+    ],
+
+    # Renderers (for formatting outgoing responses)
+    'DEFAULT_RENDERER_CLASSES': [
+        'rest_framework.renderers.JSONRenderer',  # Sends responses in JSON format
+    ],
+
+    # Browsable API (optional, disable for production)
+    'DEFAULT_RENDERER_CLASSES': (
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.BrowsableAPIRenderer',
+    ),
+
+    # Filter backends
+    'DEFAULT_FILTER_BACKENDS': [
+    'django_filters.rest_framework.DjangoFilterBackend',  # Enables filtering
+    'rest_framework.filters.SearchFilter',               # Enables search
+    'rest_framework.filters.OrderingFilter',             # Enables ordering
+],
+}
+
 
 # Internationalization
 # https://docs.djangoproject.com/en/4.2/topics/i18n/
@@ -122,3 +159,5 @@ STATIC_URL = 'static/'
 # https://docs.djangoproject.com/en/4.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+AUTH_USER_MODEL = 'user.User'
