@@ -43,15 +43,6 @@ class HealthLogs(models.Model):
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} - {self.activity_type}"
 
-# Clinics Model
-class Clinics(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255)
-    location = models.CharField(max_length=255)
-    contact_info = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
 
 # Appointments Model
 class Appointments(models.Model):
@@ -63,9 +54,8 @@ class Appointments(models.Model):
     def __str__(self):
         return f"{self.user.name} - {self.clinic.name} on {self.date}"
 
-
+#Clinics model
 class Clinic(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=200)
     address = models.TextField()
     phone_number = models.CharField(max_length=15)
@@ -75,7 +65,6 @@ class Clinic(models.Model):
 
 
 class Profile(models.Model):
-    id = models.IntegerField(primary_key=True)
     name = models.CharField(max_length=100)
     date_of_birth = models.DateField()
     email = models.EmailField(unique=True)
@@ -84,12 +73,10 @@ class Profile(models.Model):
 
 
 class HealthLog(models.Model):
-    id = models.IntegerField(primary_key=True)
     patient = models.ForeignKey(Profile, null=True,on_delete=models.SET_NULL)
 
 
 class Appointment(models.Model):
-    id = models.IntegerField(primary_key=True)
     patient = models.ForeignKey(Profile, null=True,on_delete=models.SET_NULL)
     clinic = models.ForeignKey(Clinic, null=True,on_delete=models.SET_NULL)
     date = models.DateField()
