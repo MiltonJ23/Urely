@@ -43,17 +43,6 @@ class HealthLogs(models.Model):
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} - {self.activity_type}"
 
-
-# Appointments Model
-class Appointments(models.Model):
-    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
-    clinic = models.ForeignKey(Clinics, on_delete=models.CASCADE)
-    date = models.DateTimeField()
-    status = models.CharField(max_length=50)
-
-    def __str__(self):
-        return f"{self.user.name} - {self.clinic.name} on {self.date}"
-
 #Clinics model
 class Clinic(models.Model):
     name = models.CharField(max_length=200)
@@ -62,6 +51,17 @@ class Clinic(models.Model):
     email = models.EmailField(unique=True)
     opening_hours = models.CharField(max_length=100)
     closing_hours = models.CharField(max_length=100)
+
+# Appointments Model
+class Appointments(models.Model):
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
+    date = models.DateTimeField()
+    status = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.user.name} - {self.clinic.name} on {self.date}"
+
 
 
 class Profile(models.Model):
