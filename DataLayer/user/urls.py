@@ -2,13 +2,12 @@ from django.urls import path
 from user import views
 
 urlpatterns = [
-    path('profiles/', views.profile_list),
-    path('clinics/', views.clinic_list),
-    path('health/', views.health_list),
-    path('appointment/', views.appointment_list),
-    path('profile/<int:id>/', views.profile_detail),
-    path('clinic/<int:id>/', views.clinic_detail),
-    path('health/<int:id>/', views.health_detail),
-    path('appointment/<int:id>/', views.appointment_detail),
-
+    path('profiles/', views.ProfileList.as_view()),
+    path('clinics/', views.ClinicList.as_view()),
+    path('health/', views.HealthList.as_view()),
+    path('appointment/', views.AppointmentList.as_view()),
+    path('profile/<int:id>/', views.ProfileDetail.as_view()),
+    path('clinic/<int:id>/', views.ClinicDetail.as_view()),
+    path('health/<int:id>/', views.HealthDetail.as_view()),
+    path('appointment/<int:id>/', views.AppointmentDetail.as_view()),
 ]
