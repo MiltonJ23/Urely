@@ -16,7 +16,7 @@ class UserManager(BaseUserManager):
         extra_fields.setdefault('is_superuser', True)
         return self.create_user(email, password, **extra_fields)
 
-class User(AbstractBaseUser, PermissionsMixin):
+class UserAccount(AbstractBaseUser, PermissionsMixin):
     email = models.EmailField(unique=True)
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
@@ -35,7 +35,7 @@ class User(AbstractBaseUser, PermissionsMixin):
 
 # HealthLogs Model
 class HealthLogs(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     activity_type = models.CharField(max_length=100)
     value = models.DecimalField(max_digits=5, decimal_places=2)
     timestamp = models.DateTimeField(auto_now_add=True)
@@ -43,19 +43,10 @@ class HealthLogs(models.Model):
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} - {self.activity_type}"
 
-# Clinics Model
-class Clinics(models.Model):
-    id = models.AutoField(primary_key=True)
-    name = models.CharField(max_length=255)
-    location = models.CharField(max_length=255)
-    contact_info = models.CharField(max_length=255)
-
-    def __str__(self):
-        return self.name
 
 # Appointments Model
 class Appointments(models.Model):
-    user = models.ForeignKey(User, on_delete=models.CASCADE)
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     clinic = models.ForeignKey(Clinics, on_delete=models.CASCADE)
     date = models.DateTimeField()
     status = models.CharField(max_length=50)
@@ -63,4 +54,40 @@ class Appointments(models.Model):
     def __str__(self):
         return f"{self.user.name} - {self.clinic.name} on {self.date}"
 
+#Clinics model
+class Clinic(models.Model):
+    name = models.CharField(max_length=200)
+    address = models.TextField()
+    phone_number = models.CharField(max_length=15)
+    email = models.EmailField(unique=True)
+    opening_hours = models.CharField(max_length=100)
+    closing_hours = models.CharField(max_length=100)
 
+
+class Profile(models.Model):
+    name = models.CharField(max_length=100)
+    date_of_birth = models.DateField()
+    email = models.EmailField(unique=True)
+    phone_number = models.CharField(max_length=15)
+    address = models.TextField()
+
+
+class HealthLog(models.Model):
+    patient = models.ForeignKey(Profile, null=True,on_delete=models.SET_NULL)
+
+
+class Appointment(models.Model):
+    patient = models.ForeignKey(Profile, null=True,on_delete=models.SET_NULL)
+    clinic = models.ForeignKey(Clinic, null=True,on_delete=models.SET_NULL)
+    date = models.DateField()
+    time = models.TimeField()
+    reason = models.TextField(max_length=255)
+    status = models.CharField(
+        max_length=20,
+        choices=[
+            ("Scheduled", "Scheduled"),
+            ("Completed", "Completed"),
+            ("Cancelled", "Cancelled"),
+        ],
+        default="Scheduled",
+    )
