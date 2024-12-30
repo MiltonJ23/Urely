@@ -11,7 +11,7 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), '..', 'D
 setup()
 
 
-from user.models import User
+from user.models import UserAccount
 from user.views import test
 from fastapi import FastAPI
 
@@ -20,5 +20,3 @@ app = FastAPI()
 @app.get('/')
 def index():
     return {'Data': 'Hello there'}
-
-test()
