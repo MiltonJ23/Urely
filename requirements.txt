@@ -1,0 +1,7 @@
+fastapi[all]
+Django
+djangorestframework
+djangorestframework-simplejwt
+requests
+django_filter
+django-cors-headers
