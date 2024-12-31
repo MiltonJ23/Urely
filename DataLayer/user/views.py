@@ -5,6 +5,7 @@ from rest_framework.response import Response
 from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.authentication import JWTAuthentication
 from .serializers import ProfileSerializer, UserRegistrationSerializer, UserSerializer
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
@@ -63,159 +64,168 @@ class ProfileView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    
+    def post(request):
+            serializer = AppointmentSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=201)
+            return Response(serializer.errors, status=400)
+
+class VerifyTokenView(APIView):
+    authentication_classes = [JWTAuthentication]
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request):
+        """
+        Verify the token and return user details.
+        """
+        user = request.user
+        return Response({
+            "id": user.id,
+            "email": user.email,
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "preferred_language": user.preferred_language,
+        })
 
 
-@csrf_exempt
-def profile_list(request):
-    if request.method == 'GET':
-        profile = Profile.objects.all()
-        serializer = ProfileSerializer(profile, many=True)
-        return JsonResponse(serializer.data, safe=False)
+class ClinicList(APIView):        
+        def get(request):
+            snippets = Clinic.objects.all()
+            serializer = ClinicSerializer(snippets, many=True)
+            return Response(serializer.data, safe=False)
 
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = ProfileSerializer(data=data)
+        def post(request):
+            serializer = ClinicSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class HealthList(APIView):        
+        def get(request):
+            health = HealthLog.objects.all()
+            serializer = HealthSerializer(health, many=True)
+            return Response(serializer.data, safe=False)
+
+        def post(request):
+            serializer = HealthSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=201)
+            return Response(serializer.errors, status=400)
+        
+class AppointmentList(APIView):        
+        def get(request):
+            snippets = Appointment.objects.all()
+            serializer = AppointmentSerializer(snippets, many=True)
+            return Response(serializer.data, safe=False)
+
+        def post(request):
+            serializer = AppointmentSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=201)
+            return Response(serializer.errors, status=400)
+        
+class ProfileDetail(APIView):
+
+    def get_object(self, id):
+        try:
+            return Profile.objects.get(id=id)
+        except Profile.DoesNotExist:
+            raise Response(status=status.HTTP_404_NOT_FOUND)
+
+    def get(self, request, id):
+        profile = self.get_object(id)
+        serializer = ProfileSerializer(profile)
+        return Response(serializer.data)
+
+    def put(self, request, id):
+        profile = self.get_object(id) 
+        serializer = ProfileSerializer(profile, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+
+    def delete(self, request, id):
+        profile = self.get_object(id)
+        profile.delete()
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
-@csrf_exempt
-def clinic_list(request):
-    """
-    List all code snippets, or create a new snippet.
-    """
-    if request.method == 'GET':
-        snippets = Clinic.objects.all()
-        serializer = ClinicSerializer(snippets, many=True)
-        return JsonResponse(serializer.data, safe=False)
+class ClinicDetail(APIView):
+    def get_object(self, id):
+        try:
+            return Clinic.objects.get(id=id)
+        except Clinic.DoesNotExist:
+            raise Response(status=status.HTTP_404_NOT_FOUND)
 
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = ClinicSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
-    
-@csrf_exempt
-def health_list(request):
-    if request.method == 'GET':
-        health = HealthLog.objects.all()
-        serializer = HealthSerializer(health, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = HealthSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
-    
-@csrf_exempt
-def appointment_list(request):
-    if request.method == 'GET':
-        snippets = Appointment.objects.all()
-        serializer = AppointmentSerializer(snippets, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = AppointmentSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
-    
-@csrf_exempt
-def profile_detail(request, id):
-    try:
-        snippet = Profile.objects.get(id=id)
-    except Profile.DoesNotExist:
-        return HttpResponse(status=404)
-
-    if request.method == 'GET':
-        serializer = ProfileSerializer(snippet)
-        return JsonResponse(serializer.data)
-
-    elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = ProfileSerializer(snippet, data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
-
-    elif request.method == 'DELETE':
-        snippet.delete()
-        return HttpResponse(status=204)
-    
-@csrf_exempt
-def clinic_detail(request, id):
-    try:
-        clinic = Clinic.objects.get(id=id)
-    except Clinic.DoesNotExist:
-        return HttpResponse(status=404)
-
-    if request.method == 'GET':
+    def get(self, request, id):
+        clinic = self.get_object(id)
         serializer = ClinicSerializer(clinic)
-        return JsonResponse(serializer.data)
+        return Response(serializer.data)
 
-    elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = ClinicSerializer(clinic, data=data)
+    def put(self, request, id):
+        clinic = self.get_object(id) 
+        serializer = ClinicSerializer(clinic, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':
+    def delete(self, request, id):
+        clinic = self.get_object(id)
         clinic.delete()
-        return HttpResponse(status=204)
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
-@csrf_exempt
-def health_detail(request, id):
-    try:
-        health = HealthLog.objects.get(id=id)
-    except HealthLog.DoesNotExist:
-        return HttpResponse(status=404)
+class HealthDetail(APIView):
+    def get_object(self, id):
+        try:
+            return HealthLog.objects.get(id=id)
+        except HealthLog.DoesNotExist:
+            raise Response(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
+    def get(self, request, id):
+        health = self.get_object(id)
         serializer = HealthSerializer(health)
-        return JsonResponse(serializer.data)
+        return Response(serializer.data)
 
-    elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = HealthSerializer(health, data=data)
+    def put(self, request, id):
+        health = self.get_object(id)
+        serializer = HealthSerializer(health, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
 
-    elif request.method == 'DELETE':
+    def delete(self, request, id):
+        health = self.get_object(id)
         health.delete()
-        return HttpResponse(status=204)
+        return Response(status=status.HTTP_204_NO_CONTENT)
     
-@csrf_exempt
-def appointment_detail(request, id):
-    try:
-        appointment = Appointment.objects.get(id=id)
-    except Appointment.DoesNotExist:
-        return HttpResponse(status=404)
+class AppointmentDetail(APIView):
+    def get_object(self, id):
+        try:
+            return Appointment.objects.get(id=id)
+        except Appointment.DoesNotExist:
+            raise Response(status=status.HTTP_404_NOT_FOUND)
 
-    if request.method == 'GET':
+    def get(self, request, id):
+        appointment = self.get_object(id)
         serializer = AppointmentSerializer(appointment)
-        return JsonResponse(serializer.data)
+        return Response(serializer.data)
 
-    elif request.method == 'PUT':
-        data = JSONParser().parse(request)
-        serializer = AppointmentSerializer(appointment, data=data)
+    def put(self, request, id):
+        appointment = self.get_object(id)
+        serializer = AppointmentSerializer(appointment, data=request.data)
         if serializer.is_valid():
             serializer.save()
-            return JsonResponse(serializer.data)
-        return JsonResponse(serializer.errors, status=400)
+            return Response(serializer.data)
+        return Response(serializer.errors, status=400)
 
-    elif request.method == 'DELETE':
+    def delete(self, request, id):
+        appointment = self.get_object(id)
         appointment.delete()
-        return HttpResponse(status=204)
+        return Response(status=204)
