@@ -1,19 +1,20 @@
-## What you'll learn
+# Project Template
 
-- Routing
-- User authorization
-- theming
-- context
-- states
-- hooks
+This project template is ready for you to use and modify. Just follow the steps below to get started:
 
-## What is used
+````bash
+# Clone the Repository
+git clone <repository_url>
 
-- React
-- MUI v5
-- react-router-dom
-- recharts
-- echarts-for-react
+# Navigate to the Project Directory
+cd <project_folder_name>
+
+# Install Dependencies
+npm install
+
+# Start the Project
+npm start
+
 
 ## Build the Docker Image:
 
@@ -21,7 +22,7 @@ Open your terminal, navigate to the project's root directory, and run the follow
 
 ```bash
 docker build -t dashboard-frontend .
-```
+````
 
 ## Start the Development Environment:
 
