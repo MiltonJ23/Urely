@@ -1,0 +1,120 @@
+import { useState } from 'react';
+
+function App() {
+  const [appointments, setAppointments] = useState(0);
+
+  // Styles intégrés
+  const styles = {
+    appContainer: {
+      fontFamily: 'Arial, sans-serif',
+      lineHeight: 1.6,
+      backgroundColor: '#f9f9f9',
+      color: '#333',
+      padding: '20px',
+    },
+    header: {
+      backgroundColor: '#4CAF50',
+      color: 'white',
+      padding: '20px',
+      textAlign: 'center',
+      borderRadius: '10px',
+    },
+    section: {
+      margin: '20px 0',
+    },
+    featureItem: {
+      background: 'white',
+      border: '1px solid #ddd',
+      borderRadius: '10px',
+      padding: '15px',
+      marginBottom: '15px',
+      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    },
+    card: {
+      textAlign: 'center',
+      marginTop: '20px',
+      padding: '15px',
+      background: 'white',
+      border: '1px solid #ddd',
+      borderRadius: '10px',
+      boxShadow: '0 2px 5px rgba(0, 0, 0, 0.1)',
+    },
+    button: {
+      backgroundColor: '#4CAF50',
+      color: 'white',
+      border: 'none',
+      padding: '10px 20px',
+      borderRadius: '5px',
+      cursor: 'pointer',
+      fontSize: '16px',
+    },
+    buttonHover: {
+      backgroundColor: '#45a049',
+    },
+    footer: {
+      backgroundColor: '#333',
+      color: 'white',
+      textAlign: 'center',
+      padding: '10px',
+      borderRadius: '5px',
+      marginTop: '20px',
+    },
+  };
+
+  return (
+    <div style={styles.appContainer}>
+      <header style={styles.header}>
+        <h1>Bienvenue sur l'Application de Santé Locale</h1>
+        <p>
+          Accédez facilement aux services de santé grâce à une plateforme intuitive et pratique.
+        </p>
+      </header>
+
+      <main>
+        <section style={styles.section}>
+          <h2>Fonctionnalités principales</h2>
+          <div style={styles.featureItem}>
+            <h3>1. Prise de Rendez-vous</h3>
+            <p>
+              Réservez vos rendez-vous directement en ligne avec des cliniques et pharmacies près de chez vous.
+            </p>
+          </div>
+
+          <div style={styles.featureItem}>
+            <h3>2. Localisateur de Facilités</h3>
+            <p>
+              Trouvez facilement des établissements de santé à proximité grâce à une carte interactive.
+            </p>
+            <p>
+              <strong>Exemple :</strong> Recherchez des hôpitaux, cliniques, et pharmacies proches de votre
+              emplacement.
+            </p>
+          </div>
+        </section>
+
+        <section style={styles.section}>
+          <h2>Utilisation</h2>
+          <div style={styles.card}>
+            <button
+              style={styles.button}
+              onMouseOver={(e) => (e.target.style.backgroundColor = '#45a049')}
+              onMouseOut={(e) => (e.target.style.backgroundColor = '#4CAF50')}
+              onClick={() => setAppointments(appointments + 1)}
+            >
+              Nombre de rendez-vous pris : {appointments}
+            </button>
+            <p>
+              Utilisez cette application pour une gestion rapide et efficace de vos besoins en santé.
+            </p>
+          </div>
+        </section>
+      </main>
+
+      <footer style={styles.footer}>
+        <p>Contactez-nous pour toute assistance ou information supplémentaire.</p>
+      </footer>
+    </div>
+  );
+}
+
+export default App;
