@@ -51,11 +51,11 @@ const primarynavList = [
     label: "Calender",
     icon: <CalendarMonthIcon />,
   },
-  {
-    link: "/kanban",
-    label: "Kanban",
-    icon: <ViewKanbanIcon />,
-  },
+  // {
+  //   link: "/kanban",
+  //   label: "Kanban",
+  //   icon: <ViewKanbanIcon />,
+  // },
   {
     link: "/account",
     label: "Account",

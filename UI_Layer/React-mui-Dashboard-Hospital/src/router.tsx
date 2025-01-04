@@ -16,6 +16,7 @@ import Kanban from "./pages/Kanban/Kanban";
 import Account from "./pages/Account/Account";
 import Settings from "./pages/Settings/Settings";
 import { mockPatientData } from "./mockData";
+import PatientForm from "./pages/Form/Form";
 
 const USER_TYPES = {
   NORMAL_USER: "Normal User",
@@ -242,13 +243,21 @@ export const router = createBrowserRouter([
     ),
   },
   {
-    path: "/kanban",
+    path: "/forms",
     element: (
-      <AdminElement>
-        <Kanban />
-      </AdminElement>
+      <ProtectedRoute>
+        <PatientForm />
+      </ProtectedRoute>
     ),
   },
+  // {
+  //   path: "/kanban",
+  //   element: (
+  //     <AdminElement>
+  //       <Kanban />
+  //     </AdminElement>
+  //   ),
+  // },
   {
     path: "/account",
     element: (
