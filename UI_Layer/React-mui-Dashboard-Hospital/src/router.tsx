@@ -19,6 +19,7 @@ import { mockPatientData } from "./mockData";
 import PatientForm from "./pages/Form/Form";
 import LabResultsTableData from "./pages/Lab_Results/Result";
 import MedicalRecord from "./pages/Medical_Record/Medical_Record";
+import Prescription from "./pages/Prescribtion/Prescribtion";
 
 const USER_TYPES = {
   NORMAL_USER: "Normal User",
@@ -265,6 +266,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <MedicalRecord />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/prescriptions",
+    element: (
+      <ProtectedRoute>
+        <Prescription />
       </ProtectedRoute>
     ),
   },
