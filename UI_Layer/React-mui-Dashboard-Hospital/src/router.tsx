@@ -20,6 +20,8 @@ import PatientForm from "./pages/Form/Form";
 import LabResultsTableData from "./pages/Lab_Results/Result";
 import MedicalRecord from "./pages/Medical_Record/Medical_Record";
 import Prescription from "./pages/Prescribtion/Prescribtion";
+import CarePlan from "./pages/Care_Plan/Careplan";
+import Help from "./pages/Help/Help";
 
 const USER_TYPES = {
   NORMAL_USER: "Normal User",
@@ -274,6 +276,22 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Prescription />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/plans",
+    element: (
+      <ProtectedRoute>
+        <CarePlan />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/help",
+    element: (
+      <ProtectedRoute>
+        <Help />
       </ProtectedRoute>
     ),
   },
