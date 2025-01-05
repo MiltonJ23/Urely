@@ -17,6 +17,7 @@ import Account from "./pages/Account/Account";
 import Settings from "./pages/Settings/Settings";
 import { mockPatientData } from "./mockData";
 import PatientForm from "./pages/Form/Form";
+import LabResultsTableData from "./pages/Lab_Results/Result";
 
 const USER_TYPES = {
   NORMAL_USER: "Normal User",
@@ -247,6 +248,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <PatientForm />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/lab-results",
+    element: (
+      <ProtectedRoute>
+        <LabResultsTableData />
       </ProtectedRoute>
     ),
   },
