@@ -4,14 +4,14 @@ from .views import ProfileView, UserRegistrationView, UserDetailView, LogoutView
 from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
 
 urlpatterns = [
-    path('profiles/', views.profile_list),
-    path('clinics/', views.clinic_list),
-    path('health/', views.health_list),
-    path('appointment/', views.appointment_list),
-    path('profile/<int:id>/', views.profile_detail),
-    path('clinic/<int:id>/', views.clinic_detail),
-    path('health/<int:id>/', views.health_detail),
-    path('appointment/<int:id>/', views.appointment_detail),
+    # path('profiles/', ProfileView.as_view(), name='profile'),
+    # path('clinics/', ClinicView.as_view(), name='clinic'),
+    # path('health/', views.health_list),
+    # path('appointment/', views.appointment_list),
+    # path('profile/<int:id>/', views.profile_detail),
+    # path('clinic/<int:id>/', views.clinic_detail),
+    # path('health/<int:id>/', views.health_detail),
+    # path('appointment/<int:id>/', views.appointment_detail),
 
     path('register/', UserRegistrationView.as_view(), name='register'),
     path('profile/', UserDetailView.as_view(), name='user-detail'),

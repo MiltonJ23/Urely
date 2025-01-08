@@ -1,19 +1,6 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
-class Clinic(models.Model):
-    id = models.IntegerField(primary_key=True)
-    name = models.CharField(max_length=200)
-    address = models.TextField()
-    phone_number = models.CharField(max_length=15)
-    email = models.EmailField(unique=True)
-    opening_hours = models.CharField(max_length=100)
-    closing_hours = models.CharField(max_length=100)
-
-
-class Profile(models.Model):
-    id = models.IntegerField(primary_key=True)
-    
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -69,6 +56,7 @@ class Clinic(models.Model):
 class Appointments(models.Model):
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
+    email_address = models.EmailField()
     date = models.DateTimeField()
     status = models.CharField(max_length=50)
 

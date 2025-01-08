@@ -6,12 +6,11 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .serializers import ProfileSerializer, UserRegistrationSerializer, UserSerializer
+from .serializers import *
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from user.models import Profile,Clinic,HealthLog,Appointment
-from user.serializer import ProfileSerializer,ClinicSerializer,HealthSerializer,AppointmentSerializer
 
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]
