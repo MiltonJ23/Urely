@@ -22,6 +22,7 @@ import MedicalRecord from "./pages/Medical_Record/Medical_Record";
 import Prescription from "./pages/Prescribtion/Prescribtion";
 import CarePlan from "./pages/Care_Plan/Careplan";
 import Help from "./pages/Help/Help";
+import UserDashboard from "../src/pages/user-dashboard/user-dashboarduser-dashboarduser-dashboard";
 
 const USER_TYPES = {
   NORMAL_USER: "Normal User",
@@ -187,6 +188,14 @@ export const router = createBrowserRouter([
     element: (
       <ProtectedRoute>
         <Dashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/user-dashboard",
+    element: (
+      <ProtectedRoute>
+        <UserDashboard />
       </ProtectedRoute>
     ),
   },

@@ -27,6 +27,11 @@ const primarynavList = [
     icon: <DashboardIcon />,
   },
   {
+    link: "/user-dashboard",
+    label: "User Dashboard",
+    icon: <DashboardIcon />,
+  },
+  {
     link: "/profile",
     label: "Doctor Profile",
     icon: <AccountCircleIcon />,
