@@ -56,6 +56,7 @@ class Clinic(models.Model):
 class Appointments(models.Model):
     user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
     clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
+    email_address = models.EmailField()
     date = models.DateTimeField()
     status = models.CharField(max_length=50)
 
