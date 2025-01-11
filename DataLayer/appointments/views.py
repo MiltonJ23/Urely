@@ -1,4 +1,5 @@
 # views.py
+from django.shortcuts import get_object_or_404
 from rest_framework import status
 from rest_framework.decorators import api_view
 from rest_framework.response import Response
@@ -40,3 +41,24 @@ def cancel_appointment(request, appointment_id):
     appointment.status = "Cancelled"
     appointment.save()
     return Response(AppointmentSerializer(appointment).data)
+
+def get_appointment_details(appointment_id):
+    """
+    Retrieve the details of a specific appointment by its ID.
+    """
+
+    # Fetch the appointment or return a 404 if not found
+    appointment = get_object_or_404(Appointment, id=appointment_id)
+
+    # Construct the appointment details as a dictionary
+    appointment_details = {
+        "id": appointment.id,
+        "user": appointment.user.email,  # Assuming the user model has a `username` field
+        "doctor_name": appointment.doctor.name,
+        "doctor_specialty": appointment.doctor.specialty,
+        "doctor_phone_number": appointment.doctor.phone_number,
+        "date": appointment.date.strftime("%Y-%m-%d %H:%M:%S"),
+        "status": appointment.get_status_display(),  # Converts 'pending' to 'Pending'
+    }
+
+    return appointment_details
