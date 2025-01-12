@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   AppBar,
   Toolbar,
@@ -6,71 +6,41 @@ import {
   TextField,
   Button,
   Grid,
-  Select,
-  MenuItem,
-  FormHelperText,
-  InputLabel,
-  FormControl,
   Container,
 } from "@mui/material";
 import { Formik, Field, Form, ErrorMessage } from "formik";
 import * as Yup from "yup";
 
-const PatientForm: React.FC = () => {
-  // Initial values for the form
+const FeedbackForm: React.FC = () => {
+  // State to store submitted feedback
+  const [feedback, setFeedback] = useState<string | null>(null);
+
+  // Initial values for the feedback form
   const initialValues = {
-    firstName: "",
-    lastName: "",
-    email: "",
-    phoneNumber: "",
-    age: "",
-    address: "",
-    bloodGroup: "",
-    referredByDoctor: "",
-    referredByDoctorEmail: "",
-    referredByDoctorPhoneNumber: "",
-    diseases: "",
-    patientHistory: "",
+    firstRendezvousFeedback: "",
+    experienceFeedback: "",
   };
 
-  // Validation schema
+  // Validation schema for feedback form
   const validationSchema = Yup.object({
-    firstName: Yup.string().required("First name is required"),
-    lastName: Yup.string().required("Last name is required"),
-    email: Yup.string()
-      .email("Invalid email address")
-      .required("Email is required"),
-    phoneNumber: Yup.string()
-      .required("Phone number is required")
-      .matches(/^[0-9]+$/, "Must be a valid phone number"),
-    age: Yup.number()
-      .required("Age is required")
-      .positive("Age must be positive")
-      .integer("Age must be an integer"),
-    address: Yup.string().required("Address is required"),
-    bloodGroup: Yup.string().required("Blood group is required"),
-    referredByDoctor: Yup.string().required("Doctor name is required"),
-    referredByDoctorEmail: Yup.string()
-      .email("Invalid email address")
-      .required("Doctor email is required"),
-    referredByDoctorPhoneNumber: Yup.string()
-      .required("Doctor phone number is required")
-      .matches(/^[0-9]+$/, "Must be a valid phone number"),
-    diseases: Yup.string().required("Diseases field is required"),
-    patientHistory: Yup.string().required("Patient history is required"),
+    firstRendezvousFeedback: Yup.string().required("Feedback is required"),
+    experienceFeedback: Yup.string().required(
+      "Experience feedback is required"
+    ),
   });
 
   // Form submission handler
   const onSubmit = (values: typeof initialValues) => {
-    console.log("Form submitted:", values);
-    alert("Form submitted successfully!");
+    setFeedback(
+      `First Rendezvous Feedback: ${values.firstRendezvousFeedback}\nExperience Feedback: ${values.experienceFeedback}`
+    );
   };
 
   return (
     <Container maxWidth="md">
       <AppBar position="static">
         <Toolbar>
-          <Typography variant="h6">Patient Examination Form</Typography>
+          <Typography variant="h6">Patient Feedback Form</Typography>
         </Toolbar>
       </AppBar>
 
@@ -82,163 +52,35 @@ const PatientForm: React.FC = () => {
         {({ touched, errors }) => (
           <Form>
             <Grid container spacing={3} style={{ marginTop: 20 }}>
-              <Grid item xs={12} sm={6}>
+              <Grid item xs={12}>
                 <Field
                   as={TextField}
-                  name="firstName"
-                  label="First Name"
+                  name="firstRendezvousFeedback"
+                  label="How was the first rendezvous?"
                   fullWidth
-                  error={touched.firstName && Boolean(errors.firstName)}
-                  helperText={<ErrorMessage name="firstName" />}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  name="lastName"
-                  label="Last Name"
-                  fullWidth
-                  error={touched.lastName && Boolean(errors.lastName)}
-                  helperText={<ErrorMessage name="lastName" />}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  name="email"
-                  label="Email"
-                  fullWidth
-                  error={touched.email && Boolean(errors.email)}
-                  helperText={<ErrorMessage name="email" />}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  name="phoneNumber"
-                  label="Phone Number"
-                  fullWidth
-                  error={touched.phoneNumber && Boolean(errors.phoneNumber)}
-                  helperText={<ErrorMessage name="phoneNumber" />}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  name="age"
-                  label="Age"
-                  fullWidth
-                  error={touched.age && Boolean(errors.age)}
-                  helperText={<ErrorMessage name="age" />}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  name="address"
-                  label="Address"
-                  fullWidth
-                  error={touched.address && Boolean(errors.address)}
-                  helperText={<ErrorMessage name="address" />}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <FormControl
-                  fullWidth
-                  error={touched.bloodGroup && Boolean(errors.bloodGroup)}
-                >
-                  <InputLabel id="blood-group-label">Blood Group</InputLabel>
-                  <Field
-                    as={Select}
-                    name="bloodGroup"
-                    labelId="blood-group-label"
-                  >
-                    <MenuItem value="">Select Blood Group</MenuItem>
-                    <MenuItem value="A+">A+</MenuItem>
-                    <MenuItem value="B+">B+</MenuItem>
-                    <MenuItem value="O+">O+</MenuItem>
-                    <MenuItem value="AB+">AB+</MenuItem>
-                  </Field>
-                  <FormHelperText>
-                    <ErrorMessage name="bloodGroup" />
-                  </FormHelperText>
-                </FormControl>
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  name="referredByDoctor"
-                  label="Referred By Doctor"
-                  fullWidth
+                  multiline
+                  rows={4}
                   error={
-                    touched.referredByDoctor && Boolean(errors.referredByDoctor)
+                    touched.firstRendezvousFeedback &&
+                    Boolean(errors.firstRendezvousFeedback)
                   }
-                  helperText={<ErrorMessage name="referredByDoctor" />}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  name="referredByDoctorEmail"
-                  label="Doctor's Email"
-                  fullWidth
-                  error={
-                    touched.referredByDoctorEmail &&
-                    Boolean(errors.referredByDoctorEmail)
-                  }
-                  helperText={<ErrorMessage name="referredByDoctorEmail" />}
-                />
-              </Grid>
-
-              <Grid item xs={12} sm={6}>
-                <Field
-                  as={TextField}
-                  name="referredByDoctorPhoneNumber"
-                  label="Doctor's Phone Number"
-                  fullWidth
-                  error={
-                    touched.referredByDoctorPhoneNumber &&
-                    Boolean(errors.referredByDoctorPhoneNumber)
-                  }
-                  helperText={
-                    <ErrorMessage name="referredByDoctorPhoneNumber" />
-                  }
+                  helperText={<ErrorMessage name="firstRendezvousFeedback" />}
                 />
               </Grid>
 
               <Grid item xs={12}>
                 <Field
                   as={TextField}
-                  name="diseases"
-                  label="Diseases"
+                  name="experienceFeedback"
+                  label="Describe your experience"
                   fullWidth
                   multiline
-                  rows={3}
-                  error={touched.diseases && Boolean(errors.diseases)}
-                  helperText={<ErrorMessage name="diseases" />}
-                />
-              </Grid>
-
-              <Grid item xs={12}>
-                <Field
-                  as={TextField}
-                  name="patientHistory"
-                  label="Patient History"
-                  fullWidth
-                  multiline
-                  rows={3}
+                  rows={4}
                   error={
-                    touched.patientHistory && Boolean(errors.patientHistory)
+                    touched.experienceFeedback &&
+                    Boolean(errors.experienceFeedback)
                   }
-                  helperText={<ErrorMessage name="patientHistory" />}
+                  helperText={<ErrorMessage name="experienceFeedback" />}
                 />
               </Grid>
 
@@ -256,8 +98,18 @@ const PatientForm: React.FC = () => {
           </Form>
         )}
       </Formik>
+
+      {/* Display feedback after form submission */}
+      {feedback && (
+        <div style={{ marginTop: 20 }}>
+          <Typography variant="h6" gutterBottom>
+            Submitted Feedback:
+          </Typography>
+          <pre>{feedback}</pre>
+        </div>
+      )}
     </Container>
   );
 };
 
-export default PatientForm;
+export default FeedbackForm;

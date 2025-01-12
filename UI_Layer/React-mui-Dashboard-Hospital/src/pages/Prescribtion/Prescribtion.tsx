@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Paper,
@@ -8,37 +8,45 @@ import {
   Container,
   Toolbar,
   IconButton,
+  TextField,
+  Button,
 } from "@mui/material";
 import ArrowBackIcon from "@mui/icons-material/ArrowBack";
 import { Link } from "react-router-dom";
 import Appbar from "../../components/Appbar";
 
-interface PrescriptionProps {
-  patient?: {
-    firstName: string;
-    lastName: string;
-    age: number;
-    bloodGroup: string;
-    diseases: string;
-    doctorName: string;
-    doctorEmail: string;
-    doctorPhone: string;
-  };
-  prescriptions?: {
-    medication: string;
-    dosage: string;
-    duration: string;
-    instructions: string;
-  }[];
-}
+const PrescriptionForm: React.FC = () => {
+  const [formData, setFormData] = useState({
+    firstName: "",
+    lastName: "",
+    age: "",
+    bloodGroup: "",
+    diseases: "",
+    doctorName: "",
+    doctorEmail: "",
+    doctorPhone: "",
+    medication: "",
+    typeOfDrug: "",
+    dosage: "",
+    duration: "",
+    instructions: "",
+  });
 
-const Prescription: React.FC<PrescriptionProps> = ({
-  patient,
-  prescriptions,
-}) => {
+  const [submittedData, setSubmittedData] = useState<any>(null);
+
+  const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmittedData(formData);
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
-      <Appbar appBarTitle="Prescription" />
+      <Appbar appBarTitle="Prescription Form" />
       <Box
         component="main"
         sx={{
@@ -58,79 +66,172 @@ const Prescription: React.FC<PrescriptionProps> = ({
               <ArrowBackIcon />
             </IconButton>
             <Typography variant="h5" align="center" gutterBottom>
-              Prescription
+              Prescription Form
             </Typography>
             <Divider sx={{ mb: 4 }} />
-            {patient ? (
-              <>
-                <Typography variant="h6" gutterBottom>
-                  Patient Information
-                </Typography>
-                <Grid container spacing={3}>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle1" gutterBottom>
-                      <strong>First Name:</strong> {patient.firstName}
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
-                      <strong>Last Name:</strong> {patient.lastName}
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
-                      <strong>Age:</strong> {patient.age}
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
-                      <strong>Blood Group:</strong> {patient.bloodGroup}
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
-                      <strong>Diseases:</strong> {patient.diseases}
-                    </Typography>
-                  </Grid>
-                  <Grid item xs={12} sm={6}>
-                    <Typography variant="subtitle1" gutterBottom>
-                      <strong>Doctor's Name:</strong> {patient.doctorName}
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
-                      <strong>Doctor's Email:</strong> {patient.doctorEmail}
-                    </Typography>
-                    <Typography variant="subtitle1" gutterBottom>
-                      <strong>Doctor's Phone:</strong> {patient.doctorPhone}
-                    </Typography>
-                  </Grid>
-                </Grid>
-                <Divider sx={{ mt: 4, mb: 4 }} />
-                <Typography variant="h6" gutterBottom>
-                  Prescription Details
-                </Typography>
-                {prescriptions && prescriptions.length > 0 ? (
-                  prescriptions.map((prescription, index) => (
-                    <Paper
-                      key={index}
-                      sx={{ p: 3, mb: 3, backgroundColor: "#f5f5f5" }}
-                    >
-                      <Typography variant="subtitle1" gutterBottom>
-                        <strong>Medication:</strong> {prescription.medication}
-                      </Typography>
-                      <Typography variant="subtitle1" gutterBottom>
-                        <strong>Dosage:</strong> {prescription.dosage}
-                      </Typography>
-                      <Typography variant="subtitle1" gutterBottom>
-                        <strong>Duration:</strong> {prescription.duration}
-                      </Typography>
-                      <Typography variant="subtitle1" gutterBottom>
-                        <strong>Instructions:</strong>{" "}
-                        {prescription.instructions}
-                      </Typography>
-                    </Paper>
-                  ))
-                ) : (
-                  <Typography variant="body1" align="center">
-                    No prescriptions available.
-                  </Typography>
-                )}
-              </>
-            ) : (
-              <Typography variant="body1" align="center">
-                No patient information available.
+            <form onSubmit={handleSubmit}>
+              <Typography variant="h6" gutterBottom>
+                Patient Information
               </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="First Name"
+                    name="firstName"
+                    value={formData.firstName}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Last Name"
+                    name="lastName"
+                    value={formData.lastName}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Age"
+                    name="age"
+                    type="number"
+                    value={formData.age}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Blood Group"
+                    name="bloodGroup"
+                    value={formData.bloodGroup}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Diseases"
+                    name="diseases"
+                    value={formData.diseases}
+                    onChange={handleChange}
+                  />
+                </Grid>
+              </Grid>
+              <Divider sx={{ mt: 4, mb: 4 }} />
+              <Typography variant="h6" gutterBottom>
+                Doctor's Information
+              </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Doctor's Name"
+                    name="doctorName"
+                    value={formData.doctorName}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Doctor's Email"
+                    name="doctorEmail"
+                    value={formData.doctorEmail}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Doctor's Phone"
+                    name="doctorPhone"
+                    value={formData.doctorPhone}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+              </Grid>
+              <Divider sx={{ mt: 4, mb: 4 }} />
+              <Typography variant="h6" gutterBottom>
+                Prescription Details
+              </Typography>
+              <Grid container spacing={3}>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Medication"
+                    name="medication"
+                    value={formData.medication}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Type of Drug"
+                    name="typeOfDrug"
+                    value={formData.typeOfDrug}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Dosage"
+                    name="dosage"
+                    value={formData.dosage}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Duration"
+                    name="duration"
+                    value={formData.duration}
+                    onChange={handleChange}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <TextField
+                    fullWidth
+                    label="Instructions"
+                    name="instructions"
+                    value={formData.instructions}
+                    onChange={handleChange}
+                  />
+                </Grid>
+              </Grid>
+              <Button
+                type="submit"
+                variant="contained"
+                color="primary"
+                sx={{ mt: 4 }}
+              >
+                Submit
+              </Button>
+            </form>
+            {submittedData && (
+              <Box sx={{ mt: 4 }}>
+                <Typography variant="h6" gutterBottom>
+                  Submitted Prescription Data
+                </Typography>
+                <pre>{JSON.stringify(submittedData, null, 2)}</pre>
+              </Box>
             )}
           </Paper>
         </Container>
@@ -139,4 +240,4 @@ const Prescription: React.FC<PrescriptionProps> = ({
   );
 };
 
-export default Prescription;
+export default PrescriptionForm;

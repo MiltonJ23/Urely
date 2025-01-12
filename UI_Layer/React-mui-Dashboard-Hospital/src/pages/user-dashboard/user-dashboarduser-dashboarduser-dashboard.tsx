@@ -176,18 +176,18 @@ const cardData: CardData[] = [
   {
     icon: <TodayIcon />,
     title: "Appointments",
-    value: 80,
+    value: 1,
   },
   {
     icon: <VolunteerActivismIcon />,
     title: "Wellness Alerts",
     value: "Stay informed on common regional conditions",
   },
-  {
-    icon: <CurrencyRupeeIcon />,
-    title: "Income",
-    value: "₹40000",
-  },
+  // {
+  //   icon: <CurrencyRupeeIcon />,
+  //   title: "Income",
+  //   value: "₹40000",
+  // },
 ];
 
 const chartData = [{ chartName: <PieChart /> }, { chartName: <BarChart /> }];

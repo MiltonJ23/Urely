@@ -1,80 +1,39 @@
-import * as Yup from "yup";
-import { Formik, Form, Field } from "formik";
+import React from "react";
 import {
-  TextField,
-  InputLabel,
-  Select,
-  MenuItem,
+  Box,
   Button,
   Grid,
   Typography,
-  Box,
-  Divider,
   Paper,
-  IconButton,
-  Toolbar,
+  List,
+  ListItem,
+  ListItemText,
+  Divider,
   Container,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Link, useParams } from "react-router-dom";
-import Appbar from "../../components/Appbar";
 
-const PatientInfoSchema = Yup.object().shape({
-  firstName: Yup.string().required("Required"),
-  lastName: Yup.string().required("Required"),
-  address: Yup.string().required("Required"),
-  phoneNumber: Yup.string()
-    .required("Required")
-    .matches(/^\d+$/, "Phone number must contain only digits"),
-  email: Yup.string().email("Invalid email").required("Required"),
-  age: Yup.number().required("Required").positive("Age must be positive"),
-  bloodGroup: Yup.string().required("Required"),
-  referredByDoctor: Yup.string().required("Required"),
-  referredByDoctorEmail: Yup.string().email("Invalid email"),
-  referredByDoctorPhoneNumber: Yup.string().matches(
-    /^\d+$/,
-    "Phone number must contain only digits"
-  ),
-  diseases: Yup.string().required("Required"),
-  patientHistory: Yup.string(),
-});
+// Example Instructions
+const careInstructions = [
+  "Take prescribed medication on time, every day.",
+  "Stay hydrated and drink at least 8 glasses of water daily.",
+  "Eat a balanced diet rich in fruits and vegetables.",
+  "Avoid stressful activities; practice relaxation techniques like yoga.",
+  "Ensure 7-8 hours of sleep each night for proper recovery.",
+  "Attend all follow-up appointments with your healthcare provider.",
+  "Monitor your symptoms and report any changes immediately.",
+  "Engage in light physical activities or exercises as advised by your doctor.",
+  "Avoid smoking and alcohol to promote faster healing.",
+  "Engage in positive activities that bring joy and reduce stress.",
+  "Try breathing exercises or meditation to relax your mind.",
+  "Maintain a positive mindset to improve your overall well-being.",
+  "Keep a journal of your recovery progress for reflection.",
+  "Get plenty of fresh air and natural sunlight for optimal health.",
+  "Take time to connect with loved ones for emotional support.",
+];
 
-const CarePlan = ({ patients }: any) => {
-  const { id } = useParams<{ id: string }>();
-
-  // Find the patient based on the ID, or handle the case when patient is not found
-  const patient = patients?.find(
-    (patient: any) => patient.id === parseInt(id || "", 10)
-  );
-
-  // If patient is not found, return a message or error handling
-  if (!patient) {
-    return <Typography variant="h6">Patient not found</Typography>;
-  }
-
-  const initialValues = {
-    firstName: patient.firstName,
-    lastName: patient.lastName,
-    address: patient.address,
-    phoneNumber: patient.phoneNumber,
-    email: patient.email,
-    age: patient.age,
-    bloodGroup: patient.bloodGroup,
-    referredByDoctor: patient.referredByDoctor,
-    referredByDoctorEmail: patient.referredByDoctorEmail,
-    referredByDoctorPhoneNumber: patient.referredByDoctorPhoneNumber,
-    diseases: patient.diseases,
-    patientHistory: patient.patientHistory,
-  };
-
-  const handleSubmit = (values: any, { resetForm }: any) => {
-    console.log(values);
-    // resetForm();
-  };
-
+const CarePlan: React.FC = () => {
   return (
     <Box sx={{ display: "flex" }}>
-      <Appbar appBarTitle="Patient Information" />
       <Box
         component="main"
         sx={{
@@ -87,200 +46,46 @@ const CarePlan = ({ patients }: any) => {
           overflow: "auto",
         }}
       >
-        <Toolbar />
         <Container sx={{ mt: 4, mb: 4 }}>
-          <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-            <Grid
-              container
-              spacing={2}
-              sx={{ marginLeft: "10px", padding: "20px" }}
-            >
-              <IconButton component={Link} to="/patient-list" color="inherit">
-                <ArrowBackIcon />
-              </IconButton>
+          <Paper sx={{ p: 3, display: "flex", flexDirection: "column" }}>
+            <Grid container spacing={2}>
               <Grid item xs={12}>
-                <Formik
-                  initialValues={initialValues}
-                  validationSchema={PatientInfoSchema}
-                  onSubmit={handleSubmit}
+                <Typography
+                  variant="h4"
+                  align="center"
+                  gutterBottom
+                  sx={{ color: "#1976d2" }}
                 >
-                  {({ errors, touched }) => (
-                    <Form>
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <Field
-                            as={TextField}
-                            name="firstName"
-                            label="First Name"
-                            fullWidth
-                            error={errors.firstName && touched.firstName}
-                            helperText={touched.firstName && errors.firstName}
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Field
-                            as={TextField}
-                            name="lastName"
-                            label="Last Name"
-                            fullWidth
-                            error={errors.lastName && touched.lastName}
-                            helperText={touched.lastName && errors.lastName}
-                          />
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Field
-                            as={TextField}
-                            name="address"
-                            label="Address"
-                            fullWidth
-                            error={errors.address && touched.address}
-                            helperText={touched.address && errors.address}
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Field
-                            as={TextField}
-                            name="phoneNumber"
-                            label="Phone Number"
-                            fullWidth
-                            error={errors.phoneNumber && touched.phoneNumber}
-                            helperText={
-                              touched.phoneNumber && errors.phoneNumber
-                            }
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Field
-                            as={TextField}
-                            name="email"
-                            label="Email"
-                            fullWidth
-                            error={errors.email && touched.email}
-                            helperText={touched.email && errors.email}
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <Field
-                            as={TextField}
-                            name="age"
-                            label="Age"
-                            fullWidth
-                            error={touched.age && Boolean(errors.age)}
-                            helperText={touched.age && errors.age}
-                          />
-                        </Grid>
-                      </Grid>
-
-                      <Grid container spacing={2}>
-                        <Grid item xs={12} sm={6}>
-                          <InputLabel
-                            id="blood-group-label"
-                            sx={{ align: "left" }}
-                          >
-                            Blood Group
-                          </InputLabel>
-                          <Select
-                            name="bloodGroup"
-                            labelId="blood-group-label"
-                            error={
-                              touched.bloodGroup && Boolean(errors.bloodGroup)
-                            }
-                            fullWidth
-                          >
-                            <MenuItem value="">Select blood group</MenuItem>
-                            <MenuItem value="A+">A+</MenuItem>
-                            <MenuItem value="A-">A-</MenuItem>
-                            <MenuItem value="B+">B+</MenuItem>
-                            <MenuItem value="B-">B-</MenuItem>
-                            <MenuItem value="AB+">AB+</MenuItem>
-                            <MenuItem value="AB-">AB-</MenuItem>
-                            <MenuItem value="O+">O+</MenuItem>
-                            <MenuItem value="O-">O-</MenuItem>
-                          </Select>
-                          {touched.bloodGroup && errors.bloodGroup && (
-                            <Box mt={1} color="red">
-                              {Object.values(errors.bloodGroup).map(
-                                (error: any, index) => (
-                                  <div key={index}>{error}</div>
-                                )
-                              )}
-                            </Box>
-                          )}
-                        </Grid>
-
-                        <Divider />
-
-                        <Grid item xs={12}>
-                          <Typography variant="h6" align="left">
-                            Referred by Doctor:
-                          </Typography>
-                        </Grid>
-                        <Grid item xs={12}>
-                          <Field
-                            as={TextField}
-                            name="referredByDoctor"
-                            label="Doctor's Name"
-                            fullWidth
-                            error={
-                              errors.referredByDoctor &&
-                              touched.referredByDoctor
-                            }
-                            helperText={
-                              touched.referredByDoctor &&
-                              errors.referredByDoctor
-                            }
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            name="doctorEmail"
-                            label="Doctor's Email"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            fullWidth
-                            name="doctorPhone"
-                            label="Doctor's Phone"
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            label="Diseases"
-                            name="diseases"
-                            fullWidth
-                          />
-                        </Grid>
-                        <Grid item xs={12} sm={6}>
-                          <TextField
-                            label="Patient History"
-                            name="patientHistory"
-                            fullWidth
-                          />
-                        </Grid>
-                      </Grid>
-
-                      <br />
-                      <Grid container justifyContent="flex-end">
-                        <Grid item xs={1} sm={1}>
-                          <Button
-                            component={Link}
-                            to="/patient-list"
-                            color="inherit"
-                          >
-                            Cancel
-                          </Button>
-                        </Grid>
-                        <Grid item xs={1} sm={1}>
-                          <Button type="submit" variant="contained">
-                            Save
-                          </Button>
-                        </Grid>
-                      </Grid>
-                    </Form>
-                  )}
-                </Formik>
+                  Recovery Care Plan
+                </Typography>
+                <Divider sx={{ mb: 3 }} />
+                <Typography variant="h6" gutterBottom>
+                  Instructions to Follow:
+                </Typography>
+                <List sx={{ bgcolor: "#f4f6f8", borderRadius: "8px", p: 2 }}>
+                  {careInstructions.map((instruction, index) => (
+                    <ListItem
+                      key={index}
+                      sx={{
+                        bgcolor: "#e3f2fd",
+                        mb: 1,
+                        borderRadius: "8px",
+                        boxShadow: 1,
+                      }}
+                    >
+                      <ListItemText primary={`• ${instruction}`} />
+                    </ListItem>
+                  ))}
+                </List>
+                <Divider sx={{ mt: 3, mb: 3 }} />
+                <Box mt={3} display="flex" justifyContent="center">
+                  <Button
+                    variant="contained"
+                    sx={{ backgroundColor: "#1976d2" }}
+                  >
+                    Acknowledge
+                  </Button>
+                </Box>
               </Grid>
             </Grid>
           </Paper>

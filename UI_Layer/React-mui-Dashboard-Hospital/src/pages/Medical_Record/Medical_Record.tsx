@@ -1,38 +1,60 @@
-import React from "react";
+import React, { useState } from "react";
 import {
   Box,
   Paper,
   Typography,
   Grid,
+  TextField,
+  Button,
   Divider,
   Container,
   Toolbar,
-  IconButton,
 } from "@mui/material";
-import ArrowBackIcon from "@mui/icons-material/ArrowBack";
-import { Link } from "react-router-dom";
 import Appbar from "../../components/Appbar";
 
-interface MedicalRecordProps {
-  patient?: {
-    firstName: string;
-    lastName: string;
-    age: number;
-    bloodGroup: string;
-    diseases: string;
-    patientHistory: string;
-    doctorName: string;
-    doctorEmail: string;
-    doctorPhone: string;
-    attachments: string[];
-    handledBy: string;
-  };
+interface MedicalReportData {
+  medication: string;
+  date: string;
+  duration: string;
+  price: string;
+  doctorNotes: string;
 }
 
-const MedicalRecord: React.FC<MedicalRecordProps> = ({ patient }) => {
+const MedicalReport: React.FC = () => {
+  const [formData, setFormData] = useState<MedicalReportData>({
+    medication: "",
+    date: "",
+    duration: "",
+    price: "",
+    doctorNotes: "",
+  });
+
+  const [submittedReports, setSubmittedReports] = useState<MedicalReportData[]>(
+    []
+  );
+
+  const handleInputChange = (
+    e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>
+  ) => {
+    const { name, value } = e.target;
+    setFormData({ ...formData, [name]: value });
+  };
+
+  const handleSubmit = (e: React.FormEvent) => {
+    e.preventDefault();
+    setSubmittedReports([...submittedReports, formData]);
+    setFormData({
+      medication: "",
+      date: "",
+      duration: "",
+      price: "",
+      doctorNotes: "",
+    });
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
-      <Appbar appBarTitle="Medical Record" />
+      <Appbar appBarTitle="Medical Report" />
       <Box
         component="main"
         sx={{
@@ -48,72 +70,108 @@ const MedicalRecord: React.FC<MedicalRecordProps> = ({ patient }) => {
         <Toolbar />
         <Container sx={{ mt: 4, mb: 4 }}>
           <Paper sx={{ p: 4 }}>
-            <IconButton component={Link} to="/patient-list" color="inherit">
-              <ArrowBackIcon />
-            </IconButton>
             <Typography variant="h5" align="center" gutterBottom>
-              Medical Record
+              Medical Report Form
             </Typography>
             <Divider sx={{ mb: 4 }} />
-            {patient ? (
+            <form onSubmit={handleSubmit}>
               <Grid container spacing={3}>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle1" gutterBottom>
-                    <strong>First Name:</strong> {patient.firstName}
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    <strong>Last Name:</strong> {patient.lastName}
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    <strong>Age:</strong> {patient.age}
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    <strong>Blood Group:</strong> {patient.bloodGroup}
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    <strong>Diseases:</strong> {patient.diseases}
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    <strong>Patient History:</strong> {patient.patientHistory}
-                  </Typography>
+                  <TextField
+                    fullWidth
+                    label="Medication"
+                    name="medication"
+                    value={formData.medication}
+                    onChange={handleInputChange}
+                    required
+                  />
                 </Grid>
                 <Grid item xs={12} sm={6}>
-                  <Typography variant="subtitle1" gutterBottom>
-                    <strong>Doctor's Name:</strong> {patient.doctorName}
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    <strong>Doctor's Email:</strong> {patient.doctorEmail}
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    <strong>Doctor's Phone:</strong> {patient.doctorPhone}
-                  </Typography>
-                  <Typography variant="subtitle1" gutterBottom>
-                    <strong>Handled By:</strong> {patient.handledBy}
-                  </Typography>
+                  <TextField
+                    fullWidth
+                    label="Date"
+                    type="date"
+                    name="date"
+                    value={formData.date}
+                    onChange={handleInputChange}
+                    InputLabelProps={{ shrink: true }}
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Duration"
+                    name="duration"
+                    value={formData.duration}
+                    onChange={handleInputChange}
+                    placeholder="e.g., 7 days"
+                    required
+                  />
+                </Grid>
+                <Grid item xs={12} sm={6}>
+                  <TextField
+                    fullWidth
+                    label="Price"
+                    name="price"
+                    value={formData.price}
+                    onChange={handleInputChange}
+                    placeholder="e.g., $50"
+                    required
+                  />
                 </Grid>
                 <Grid item xs={12}>
-                  <Typography variant="subtitle1" gutterBottom>
-                    <strong>Attachments:</strong>
-                  </Typography>
-                  <ul>
-                    {patient.attachments.map((attachment, index) => (
-                      <li key={index}>
-                        <Typography variant="body2">{attachment}</Typography>
-                      </li>
-                    ))}
-                  </ul>
+                  <TextField
+                    fullWidth
+                    multiline
+                    rows={4}
+                    label="Doctor Notes"
+                    name="doctorNotes"
+                    value={formData.doctorNotes}
+                    onChange={handleInputChange}
+                    placeholder="Additional notes or instructions from the doctor"
+                  />
+                </Grid>
+                <Grid item xs={12}>
+                  <Button type="submit" variant="contained" fullWidth>
+                    Submit
+                  </Button>
                 </Grid>
               </Grid>
-            ) : (
-              <Typography variant="body1" align="center">
-                No medical record available.
-              </Typography>
-            )}
+            </form>
           </Paper>
+
+          {submittedReports.length > 0 && (
+            <Paper sx={{ mt: 4, p: 4 }}>
+              <Typography variant="h6" align="center" gutterBottom>
+                Submitted Medical Reports
+              </Typography>
+              <Divider sx={{ mb: 4 }} />
+              {submittedReports.map((report, index) => (
+                <Paper sx={{ p: 2, mb: 2 }} key={index}>
+                  <Typography variant="subtitle1">
+                    <strong>Medication:</strong> {report.medication}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    <strong>Date:</strong> {report.date}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    <strong>Duration:</strong> {report.duration}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    <strong>Price:</strong> {report.price}
+                  </Typography>
+                  <Typography variant="subtitle1">
+                    <strong>Doctor Notes:</strong> {report.doctorNotes || "N/A"}
+                  </Typography>
+                </Paper>
+              ))}
+            </Paper>
+          )}
         </Container>
       </Box>
     </Box>
   );
 };
 
-export default MedicalRecord;
+export default MedicalReport;
