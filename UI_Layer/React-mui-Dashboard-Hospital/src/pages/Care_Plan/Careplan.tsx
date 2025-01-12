@@ -14,7 +14,7 @@ import {
 
 // Example Instructions
 const careInstructions = [
-  "Take prescribed medication on time, every day.",
+  "Take prescribed medication on time, every day and respect the time.",
   "Stay hydrated and drink at least 8 glasses of water daily.",
   "Eat a balanced diet rich in fruits and vegetables.",
   "Avoid stressful activities; practice relaxation techniques like yoga.",
