@@ -1,6 +1,19 @@
 from django.contrib.auth.models import AbstractBaseUser, BaseUserManager, PermissionsMixin
 from django.db import models
 
+class Clinic(models.Model):
+    id = models.IntegerField(primary_key=True)
+    name = models.CharField(max_length=200)
+    address = models.TextField()
+    phone_number = models.CharField(max_length=15)
+    email = models.EmailField(unique=True)
+    opening_hours = models.CharField(max_length=100)
+    closing_hours = models.CharField(max_length=100)
+
+
+class Profile(models.Model):
+    id = models.IntegerField(primary_key=True)
+    
 class UserManager(BaseUserManager):
     def create_user(self, email, password=None, **extra_fields):
         if not email:
@@ -43,17 +56,6 @@ class HealthLogs(models.Model):
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} - {self.activity_type}"
 
-
-# Appointments Model
-class Appointments(models.Model):
-    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
-    clinic = models.ForeignKey(Clinics, on_delete=models.CASCADE)
-    date = models.DateTimeField()
-    status = models.CharField(max_length=50)
-
-    def __str__(self):
-        return f"{self.user.name} - {self.clinic.name} on {self.date}"
-
 #Clinics model
 class Clinic(models.Model):
     name = models.CharField(max_length=200)
@@ -62,6 +64,17 @@ class Clinic(models.Model):
     email = models.EmailField(unique=True)
     opening_hours = models.CharField(max_length=100)
     closing_hours = models.CharField(max_length=100)
+
+# Appointments Model
+class Appointments(models.Model):
+    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
+    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
+    date = models.DateTimeField()
+    status = models.CharField(max_length=50)
+
+    def __str__(self):
+        return f"{self.user.name} - {self.clinic.name} on {self.date}"
+
 
 
 class Profile(models.Model):
