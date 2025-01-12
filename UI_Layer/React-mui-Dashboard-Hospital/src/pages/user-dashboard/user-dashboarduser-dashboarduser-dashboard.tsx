@@ -183,11 +183,11 @@ const cardData: CardData[] = [
     title: "Wellness Alerts",
     value: "Stay informed on common regional conditions",
   },
-  // {
-  //   icon: <CurrencyRupeeIcon />,
-  //   title: "Income",
-  //   value: "₹40000",
-  // },
+  {
+    icon: <CurrencyRupeeIcon />,
+    title: "Income",
+    value: "FCF400000",
+  },
 ];
 
 const chartData = [{ chartName: <PieChart /> }, { chartName: <BarChart /> }];
