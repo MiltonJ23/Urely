@@ -29,123 +29,8 @@ const USER_TYPES = {
   ADMIN_USER: "Admin User",
 };
 
-const CURRENT_USER_TYPE = USER_TYPES.ADMIN_USER;
+const CURRENT_USER_TYPE = USER_TYPES.NORMAL_USER;
 
-// const AdminElement = ({ children }: any) => {
-//   if (CURRENT_USER_TYPE === USER_TYPES.ADMIN_USER) {
-//     return <>{children}</>;
-//   } else {
-//     return <Navigate to={"/"} />;
-//   }
-// };
-
-// export const router = createBrowserRouter([
-//   {
-//     path: "/",
-//     element: <SignInSide />,
-//     errorElement: <ErrorPage />,
-//   },
-//   {
-//     path: "/login",
-//     element: <SignInSide />,
-//   },
-//   {
-//     path: "/signup",
-//     element: <SignUp />,
-//   },
-//   {
-//     path: "/forgot",
-//     element: <ForgotPassword />,
-//   },
-//   {
-//     path: "/dashboard",
-//     element: (
-//       <AdminElement>
-//         <Dashboard />
-//       </AdminElement>
-//     ),
-//   },
-//   {
-//     path: "/orders",
-//     element: (
-//       <AdminElement>
-//         <AllOrders />
-//       </AdminElement>
-//     ),
-//   },
-//   {
-//     path: "/profile",
-//     element: (
-//       <AdminElement>
-//         <Profile />
-//       </AdminElement>
-//     ),
-//   },
-//   {
-//     path: "/patient-info/:id",
-//     element: (
-//       <AdminElement>
-//         <PatientInfo patients={mockPatientData} />
-//       </AdminElement>
-//     ),
-//   },
-//   {
-//     path: "/patient-list",
-//     element: (
-//       <AdminElement>
-//         <PatientList data={mockPatientData} />
-//       </AdminElement>
-//     ),
-//   },
-//   {
-//     path: "/doctor-list",
-//     element: (
-//       <AdminElement>
-//         <DoctorList />
-//       </AdminElement>
-//     ),
-//   },
-//   {
-//     path: "/appointments",
-//     element: (
-//       <AdminElement>
-//         <Appointments />
-//       </AdminElement>
-//     ),
-//   },
-//   {
-//     path: "/calender",
-//     element: (
-//       <AdminElement>
-//         <Calender />
-//       </AdminElement>
-//     ),
-//   },
-//   {
-//     path: "/kanban",
-//     element: (
-//       <AdminElement>
-//         <Kanban />
-//       </AdminElement>
-//     ),
-//   },
-//   {
-//     path: "/account",
-//     element: (
-//       <AdminElement>
-//         <Account />
-//       </AdminElement>
-//     ),
-//   },
-//   {
-//     path: "/settings",
-//     element: (
-//       <AdminElement>
-//         <Settings />
-//       </AdminElement>
-//     ),
-//   },
-// ]);
 const AdminElement = ({ children }: any) => {
   if (CURRENT_USER_TYPE === USER_TYPES.ADMIN_USER) {
     return <>{children}</>;
@@ -335,3 +220,119 @@ export const router = createBrowserRouter([
   //   ),
   // },
 ]);
+
+// const AdminElement = ({ children }: any) => {
+//   if (CURRENT_USER_TYPE === USER_TYPES.ADMIN_USER) {
+//     return <>{children}</>;
+//   } else {
+//     return <Navigate to={"/"} />;
+//   }
+// };
+
+// export const router = createBrowserRouter([
+//   {
+//     path: "/",
+//     element: <SignInSide />,
+//     errorElement: <ErrorPage />,
+//   },
+//   {
+//     path: "/login",
+//     element: <SignInSide />,
+//   },
+//   {
+//     path: "/signup",
+//     element: <SignUp />,
+//   },
+//   {
+//     path: "/forgot",
+//     element: <ForgotPassword />,
+//   },
+//   {
+//     path: "/dashboard",
+//     element: (
+//       <AdminElement>
+//         <Dashboard />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/orders",
+//     element: (
+//       <AdminElement>
+//         <AllOrders />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/profile",
+//     element: (
+//       <AdminElement>
+//         <Profile />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/patient-info/:id",
+//     element: (
+//       <AdminElement>
+//         <PatientInfo patients={mockPatientData} />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/patient-list",
+//     element: (
+//       <AdminElement>
+//         <PatientList data={mockPatientData} />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/doctor-list",
+//     element: (
+//       <AdminElement>
+//         <DoctorList />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/appointments",
+//     element: (
+//       <AdminElement>
+//         <Appointments />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/calender",
+//     element: (
+//       <AdminElement>
+//         <Calender />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/kanban",
+//     element: (
+//       <AdminElement>
+//         <Kanban />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/account",
+//     element: (
+//       <AdminElement>
+//         <Account />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/settings",
+//     element: (
+//       <AdminElement>
+//         <Settings />
+//       </AdminElement>
+//     ),
+//   },
+// ]);
