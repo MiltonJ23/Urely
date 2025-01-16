@@ -13,6 +13,7 @@ import GoogleIcon from "@mui/icons-material/Google";
 import FacebookIcon from "@mui/icons-material/Facebook";
 import Typography from "@mui/material/Typography";
 import { Link, useNavigate } from "react-router-dom";
+import axios from "axios";
 import { Divider } from "@mui/material";
 import HeartRateLoader from "../../components/HeartRateLoader";
 import { useForm } from "react-hook-form";
@@ -203,6 +204,8 @@ type FormValues = {
 //     </>
 //   );
 // }
+
+
 export default function SignInSide() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -213,31 +216,48 @@ export default function SignInSide() {
     formState: { errors },
   } = useForm<FormValues>();
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
     setLoading(true);
-    console.log(data);
 
-    setTimeout(() => {
-      setLoading(false);
+    try {
+      // Sending login request to get token
+      const response = await axios.post('/api/auth/token', {
+        email: data.email,
+        password: data.password,
+      });
+
+      const token = response.data.token; // Adjust based on your API's response structure
+
+      // Store token in localStorage
+      localStorage.setItem("authToken", token);
+
+      // Verifying token
+      const verifyResponse = await axios.post('/api/auth/token/verify', {}, {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
 
       // Role-based navigation
-      if (data.email === "admin@domain.com" && data.password === "admin123") {
-        navigate(`/dashboard`); // Redirect to Admin Dashboard
-      } else if (
-        data.email === "user@domain.com" &&
-        data.password === "user123"
-      ) {
-        navigate(`/user-dashboard`); // Redirect to User Dashboard
+      if (verifyResponse.data.role === "admin") {
+        navigate(`/dashboard`);
+      } else if (verifyResponse.data.role === "user") {
+        navigate(`/user-dashboard`);
       } else {
-        alert("Invalid credentials");
+        alert("Unauthorized role");
       }
-    }, 3000);
+    } catch (error) {
+      alert("Invalid credentials or something went wrong");
+      console.error(error);
+    } finally {
+      setLoading(false);
+    }
   };
 
   return (
     <>
       {loading ? (
-        <HeartRateLoader message={"Get well soon!"} />
+        <HeartRateLoader message={"Logging in..."} />
       ) : (
         <Grid container component="main" sx={{ height: "100vh" }}>
           <Grid
@@ -256,24 +276,8 @@ export default function SignInSide() {
               backgroundPosition: "center",
             }}
           />
-          <Grid
-            item
-            xs={12}
-            sm={8}
-            md={5}
-            component={Paper}
-            elevation={6}
-            square
-          >
-            <Box
-              sx={{
-                my: 8,
-                mx: 4,
-                display: "flex",
-                flexDirection: "column",
-                alignItems: "center",
-              }}
-            >
+          <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
+            <Box sx={{ my: 8, mx: 4, display: "flex", flexDirection: "column", alignItems: "center" }}>
               <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
                 <LockOutlinedIcon />
               </Avatar>
@@ -316,35 +320,18 @@ export default function SignInSide() {
                     control={<Checkbox value="remember" color="primary" />}
                     label="Remember me"
                   />
-                  <Button
-                    type="submit"
-                    fullWidth
-                    variant="contained"
-                    sx={{ mt: 3, mb: 2 }}
-                  >
+                  <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
                     Sign In
                   </Button>
                 </form>
                 <Grid container>
                   <Grid item xs>
-                    <Link
-                      to={"/forgot"}
-                      style={{
-                        textDecoration: "none",
-                        color: "inherit",
-                      }}
-                    >
+                    <Link to={"/forgot"} style={{ textDecoration: "none", color: "inherit" }}>
                       Forgot password?
                     </Link>
                   </Grid>
                   <Grid item>
-                    <Link
-                      to={"/signup"}
-                      style={{
-                        textDecoration: "none",
-                        color: "inherit",
-                      }}
-                    >
+                    <Link to={"/signup"} style={{ textDecoration: "none", color: "inherit" }}>
                       {"Don't have an account? Sign Up"}
                     </Link>
                   </Grid>
@@ -352,25 +339,11 @@ export default function SignInSide() {
                 <Divider sx={{ mt: 2 }} light variant="middle">
                   OR
                 </Divider>
-                <Button
-                  fullWidth
-                  startIcon={<GoogleIcon />}
-                  variant="outlined"
-                  sx={{
-                    mt: 2,
-                  }}
-                >
+                <Button fullWidth startIcon={<GoogleIcon />} variant="outlined" sx={{ mt: 2 }}>
                   Continue with Google
                 </Button>
 
-                <Button
-                  fullWidth
-                  startIcon={<FacebookIcon />}
-                  variant="outlined"
-                  sx={{
-                    mt: 2,
-                  }}
-                >
+                <Button fullWidth startIcon={<FacebookIcon />} variant="outlined" sx={{ mt: 2 }}>
                   Continue with Facebook
                 </Button>
 

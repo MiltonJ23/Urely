@@ -48,11 +48,32 @@ const chartData = [
   //{ chartName: <OrganData /> }
 ];
 
+import React, { useEffect, useState } from "react";
+import axios from "axios";
+
 export default function ActivityLogs() {
+  const [logs, setLogs] = useState([]);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    const fetchLogs = async () => {
+      try {
+        const response = await axios.get("/api/activity-logs");
+        setLogs(response.data);
+      } catch (error) {
+        console.error("Error fetching activity logs", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    fetchLogs();
+  }, []);
+
+  if (loading) return <div>Loading...</div>;
+
   return (
     <Box sx={{ display: "flex" }}>
       <Appbar appBarTitle="Activity Logs" />
-
       <Box
         component="main"
         sx={{
@@ -65,11 +86,9 @@ export default function ActivityLogs() {
           overflow: "auto",
         }}
       >
-        <Toolbar />
-
         <Container sx={{ mt: 4, mb: 4 }}>
           <Grid container spacing={3}>
-            {cardData.map((item, index) => (
+            {logs.map((log, index) => (
               <Grid key={index} item xs={12} md={4} lg={3}>
                 <Paper
                   sx={{
@@ -80,36 +99,32 @@ export default function ActivityLogs() {
                   }}
                 >
                   <HealthCard
-                    icon={item.icon}
-                    title={item.title}
-                    value={item.value}
-                    unit={item.unit}
+                    icon={<LocalDrinkIcon />}
+                    title="Water Intake"
+                    value={log.water_intake}
+                    unit="ml / 2L"
+                  />
+                  <HealthCard
+                    icon={<DirectionsRunIcon />}
+                    title="Exercise"
+                    value={log.exercise_duration}
+                    unit="min / 60 min"
+                  />
+                  <HealthCard
+                    icon={<MedicationLiquidIcon />}
+                    title="Medication"
+                    value={log.medication_count}
+                    unit="pil / 1 pi"
+                  />
+                  <HealthCard
+                    icon={<LunchDiningIcon />}
+                    title="Food Intake"
+                    value={log.food_intake}
+                    unit="kcal / 2000 kcal"
                   />
                 </Paper>
               </Grid>
             ))}
-
-            {/* Chart */}
-            {chartData.map((item, index) => (
-              <Grid key={index} item xs={12} md={6} lg={6}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    height: 400,
-                  }}
-                >
-                  {item.chartName}
-                </Paper>
-              </Grid>
-            ))}
-            {/* <img src="https://echarts.apache.org/examples/data/asset/geo/Veins_Medical_Diagram_clip_art.svg" />
-            <Grid item xs={12}>
-              <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                <LatestAppointments />
-              </Paper>
-            </Grid> */}
           </Grid>
         </Container>
       </Box>
