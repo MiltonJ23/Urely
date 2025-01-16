@@ -33,8 +33,8 @@ Health and Wellness Companion is a web-based application designed to help users 
 
 1. **Clone the repository**:
     ```bash
-    git clone https://github.com/yourusername/health-wellness-companion.git
-    cd health-wellness-companion/backend
+    git clone https://github.com/yourusername/Urely.git
+    cd Urely/Domain_layer
     ```
 
 2. **Create a virtual environment**:
@@ -65,7 +65,7 @@ Health and Wellness Companion is a web-based application designed to help users 
 
 1. **Navigate to the frontend folder**:
     ```bash
-    cd ../frontend
+    cd ../UI_Layer/React-mui-dashboard-template
     ```
 
 2. **Install dependencies**:
