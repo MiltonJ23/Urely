@@ -16,6 +16,7 @@ import Kanban from "./pages/Kanban/Kanban";
 import Account from "./pages/Account/Account";
 import Settings from "./pages/Settings/Settings";
 import { mockPatientData } from "./mockData";
+import ActivityLogs from "./pages/ActivityLogs/ActivityLogs";
 
 const USER_TYPES = {
   NORMAL_USER: "Normal User",
@@ -55,6 +56,14 @@ export const router = createBrowserRouter([
     element: (
       <AdminElement>
         <Dashboard />
+      </AdminElement>
+    )
+  },
+  {
+    path: "/activity-logs",
+    element: (
+      <AdminElement>
+        <ActivityLogs />
       </AdminElement>
     )
   },
