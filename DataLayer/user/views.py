@@ -107,20 +107,18 @@ def clinic_list(request):
         serializer = ClinicSerializer(snippets, many=True)
         return JsonResponse(serializer.data, safe=False)
 
-    elif request.method == 'POST':
-        data = JSONParser().parse(request)
-        serializer = ClinicSerializer(data=data)
-        if serializer.is_valid():
-            serializer.save()
-            return JsonResponse(serializer.data, status=201)
-        return JsonResponse(serializer.errors, status=400)
-    
-@csrf_exempt
-def health_list(request):
-    if request.method == 'GET':
-        health = HealthLog.objects.all()
-        serializer = HealthSerializer(health, many=True)
-        return JsonResponse(serializer.data, safe=False)
+        def post(request):
+            serializer = ClinicSerializer(data=request.data)
+            if serializer.is_valid():
+                serializer.save()
+                return Response(serializer.data, status=status.HTTP_201_CREATED)
+            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        
+class HealthList(APIView):        
+        def get(request):
+            health = HealthLog.objects.all()
+            serializer = HealthSerializer(health, many=True)
+            return Response(serializer.data, safe=False)
 
         def post(request):
             serializer = HealthSerializer(data=request.data)
