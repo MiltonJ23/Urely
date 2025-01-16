@@ -19,7 +19,7 @@ import BookOnlineIcon from "@mui/icons-material/BookOnline";
 import SickIcon from "@mui/icons-material/Sick";
 import ViewKanbanIcon from "@mui/icons-material/ViewKanban";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
-import InsertChartIcon from "@mui/icons-material/InsertChart";
+import InsertChartIcon from '@mui/icons-material/InsertChart';
 
 const primarynavList = [
   {

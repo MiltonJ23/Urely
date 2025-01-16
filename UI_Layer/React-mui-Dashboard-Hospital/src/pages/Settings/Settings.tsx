@@ -162,6 +162,29 @@ export default function Settings() {
                   </RadioGroup>
                 </FormControl>
               </ListItem>
+
+              {/* Language preference section */}
+              <ListItem component={Paper} elevation={1} sx={{ mb: 2 }}>
+                <FormControl component="fieldset">
+                  <FormLabel component="legend">Language Preference</FormLabel>
+                  <RadioGroup
+                    row
+                    value={theme.palette.mode}
+                    onChange={toggleMode}
+                  >
+                    <FormControlLabel
+                      value="english"
+                      control={<Radio />}
+                      label="English"
+                    />
+                    <FormControlLabel
+                      value="french"
+                      control={<Radio />}
+                      label="French"
+                    />
+                  </RadioGroup>
+                </FormControl>
+              </ListItem>
             </List>
           </Box>
         </Container>

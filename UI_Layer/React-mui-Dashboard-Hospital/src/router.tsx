@@ -93,7 +93,14 @@ export const router = createBrowserRouter([
       </ProtectedRoute>
     ),
   },
-
+  {
+    path: "/activity-logs",
+    element: (
+      <AdminElement>
+        <ActivityLogs />
+      </AdminElement>
+    )
+  },
   {
     path: "/orders",
     element: (
