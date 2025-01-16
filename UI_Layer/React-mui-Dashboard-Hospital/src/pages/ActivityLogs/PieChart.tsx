@@ -5,11 +5,11 @@ import ReactECharts from "echarts-for-react";
 export default function PieChart() {
   const option = {
     tooltip: {
-      trigger: "item"
+      trigger: "item",
     },
     legend: {
       top: "5%",
-      left: "center"
+      left: "center",
     },
     series: [
       {
@@ -19,28 +19,28 @@ export default function PieChart() {
         itemStyle: {
           borderRadius: 10,
           borderColor: "#fff",
-          borderWidth: 2
+          borderWidth: 2,
         },
         label: {
           show: false,
-          position: "center"
+          position: "center",
         },
         emphasis: {
           label: {
             show: true,
             fontSize: 20,
-            fontWeight: "bold"
-          }
+            fontWeight: "bold",
+          },
         },
         labelLine: {
-          show: false
+          show: false,
         },
         data: [
           { value: 60, name: "Completed" },
-          { value: 40, name: "Remaining" }
-        ]
-      }
-    ]
+          { value: 40, name: "Remaining" },
+        ],
+      },
+    ],
   };
   return (
     <React.Fragment>

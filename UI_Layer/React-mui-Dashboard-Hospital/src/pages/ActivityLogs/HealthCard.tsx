@@ -5,7 +5,7 @@ import Box from "@mui/material/Box";
 import IconButton from "@mui/material/IconButton";
 import Title from "../../components/Title";
 
-import SettingsVoiceIcon from '@mui/icons-material/SettingsVoice';
+import SettingsVoiceIcon from "@mui/icons-material/SettingsVoice";
 
 export default function HealthCard(props: {
   icon: any;
@@ -34,7 +34,17 @@ export default function HealthCard(props: {
           <Typography component="p" align="center" variant="h6">
             {`${props.value} ${props.unit}`}
           </Typography>
-          <IconButton size="large" aria-label="icon" color="secondary" style={{justifyContent: 'right', left: 50, top: 2, alignSelf: 'end'}}>
+          <IconButton
+            size="large"
+            aria-label="icon"
+            color="secondary"
+            style={{
+              justifyContent: "right",
+              left: 50,
+              top: 2,
+              alignSelf: "end",
+            }}
+          >
             <SettingsVoiceIcon />
           </IconButton>
         </Stack>

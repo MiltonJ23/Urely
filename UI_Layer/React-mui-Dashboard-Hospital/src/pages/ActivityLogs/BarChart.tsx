@@ -7,37 +7,37 @@ export default function BarChart() {
     tooltip: {
       trigger: "axis",
       axisPointer: {
-        type: "shadow"
-      }
+        type: "shadow",
+      },
     },
     grid: {
       left: "3%",
       right: "4%",
       bottom: "3%",
-      containLabel: true
+      containLabel: true,
     },
     xAxis: [
       {
         type: "category",
         data: ["Mon", "Tue", "Wed", "Thu", "Fri", "Sat", "Sun"],
         axisTick: {
-          alignWithLabel: true
-        }
-      }
+          alignWithLabel: true,
+        },
+      },
     ],
     yAxis: [
       {
-        type: "value"
-      }
+        type: "value",
+      },
     ],
     series: [
       {
         name: "Exercise",
         type: "bar",
         barWidth: "60%",
-        data: [20, 56, 175, 354, 390, 330, 220]
-      }
-    ]
+        data: [20, 56, 175, 354, 390, 330, 220],
+      },
+    ],
   };
 
   return (

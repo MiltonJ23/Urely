@@ -33,6 +33,11 @@ const primarynavList = [
     icon: <InsertChartIcon />,
   },
   {
+    link: "/user-dashboard",
+    label: "User Dashboard",
+    icon: <DashboardIcon />,
+  },
+  {
     link: "/profile",
     label: "Doctor Profile",
     icon: <AccountCircleIcon />,
@@ -57,11 +62,11 @@ const primarynavList = [
     label: "Calender",
     icon: <CalendarMonthIcon />,
   },
-  {
-    link: "/kanban",
-    label: "Kanban",
-    icon: <ViewKanbanIcon />,
-  },
+  // {
+  //   link: "/kanban",
+  //   label: "Kanban",
+  //   icon: <ViewKanbanIcon />,
+  // },
   {
     link: "/account",
     label: "Account",
