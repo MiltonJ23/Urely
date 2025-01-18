@@ -8,3 +8,5 @@ django-cors-headers
 pyaudio
 speechrecognition
 python-dotenv
+django-extensions
+SQLAlchemy

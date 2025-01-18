@@ -149,11 +149,11 @@ import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
-import PieChart from "../user-dashboard/PieChart";
-import BarChart from "../user-dashboard/BarChart";
-import HealthCard from "../user-dashboard/HealthCard";
-import LatestAppointments from "../user-dashboard/LatestAppointments";
-import ActivityLog from "../user-dashboard/ActivityLog";
+import PieChart from "./PieChart";
+import BarChart from "./BarChart";
+import HealthCard from "./HealthCard";
+import LatestAppointments from "./LatestAppointments";
+import ActivityLog from "./ActivityLog";
 import Appbar from "../../components/Appbar";
 
 import PeopleIcon from "@mui/icons-material/People";

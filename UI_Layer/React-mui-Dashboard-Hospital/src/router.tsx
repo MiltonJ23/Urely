@@ -22,7 +22,7 @@ import MedicalRecord from "./pages/Medical_Record/Medical_Record";
 import Prescription from "./pages/Prescribtion/Prescribtion";
 import CarePlan from "./pages/Care_Plan/Careplan";
 import Help from "./pages/Help/Help";
-import UserDashboard from "../src/pages/user-dashboard/user-dashboarduser-dashboarduser-dashboard";
+import UserDashboard from "./pages/user-dashboard/user-dashboard";
 import ActivityLogs from "./pages/ActivityLogs/ActivityLogs";
 
 const USER_TYPES = {

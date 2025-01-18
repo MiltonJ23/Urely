@@ -216,39 +216,54 @@ export default function SignInSide() {
     formState: { errors },
   } = useForm<FormValues>();
 
+  const domain_name = "http://localhost";
+
   const onSubmit = async (data: FormValues) => {
     setLoading(true);
 
     try {
-      // Sending login request to get token
-      const response = await axios.post('/api/auth/token', {
+      // Step 1: Request login and get access token
+      const loginResponse = await axios.post(`${domain_name}:8000/api/auth/token/`, {
         email: data.email,
         password: data.password,
       });
 
-      const token = response.data.token; // Adjust based on your API's response structure
+      const { access, refresh } = loginResponse.data;
 
-      // Store token in localStorage
-      localStorage.setItem("authToken", token);
+      // Store tokens in localStorage
+      localStorage.setItem("authToken", access);
+      localStorage.setItem("refreshToken", refresh);
 
-      // Verifying token
-      const verifyResponse = await axios.post('/api/auth/token/verify', {}, {
+      // Step 2: Verify token and get user details
+      const verifyResponse = await axios.post(
+        `${domain_name}:8000/api/auth/token/verify/`,
+        {},
+        {
+          headers: {
+            Authorization: `Bearer ${access}`,
+          },
+        }
+      );
+
+      const userResponse = await axios.get(`${domain_name}:8000/api/auth/profile/`, {
         headers: {
-          Authorization: `Bearer ${token}`,
+          Authorization: `Bearer ${access}`,
         },
       });
 
-      // Role-based navigation
-      if (verifyResponse.data.role === "admin") {
-        navigate(`/dashboard`);
-      } else if (verifyResponse.data.role === "user") {
-        navigate(`/user-dashboard`);
+      const { is_superuser } = userResponse.data;
+
+      // Step 3: Role-based navigation
+      if (is_superuser) {
+        navigate("/dashboard");
       } else {
-        alert("Unauthorized role");
+        navigate("/user-dashboard");
       }
-    } catch (error) {
-      alert("Invalid credentials or something went wrong");
+    } catch (error: Error | any) {
       console.error(error);
+      alert(
+        error.response?.data?.detail || "Invalid credentials or something went wrong."
+      );
     } finally {
       setLoading(false);
     }

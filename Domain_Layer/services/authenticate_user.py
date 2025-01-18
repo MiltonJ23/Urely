@@ -1,7 +1,11 @@
 import requests
 from fastapi import APIRouter, Depends, HTTPException, status
 from fastapi.security import OAuth2PasswordBearer
-from pydantic import BaseModel
+from django.conf import settings
+
+settings.configure()
+
+from Domain_Layer.services.models import ProfileResponse, ProfileUpdate, TokenRefreshRequest, TokenResponse
 
 # Django API URLs
 DJANGO_PROFILE_URL = "http://localhost:8000/api/auth/profile/" 
@@ -13,24 +17,7 @@ oauth2_scheme = OAuth2PasswordBearer(tokenUrl="token")
 
 router = APIRouter()
 
-# Profile models for FastAPI
-class ProfileResponse(BaseModel):
-    first_name: str
-    last_name: str
-    email: str
-    preferred_language: str
 
-class ProfileUpdate(BaseModel):
-    first_name: str = None
-    last_name: str = None
-    preferred_language: str = None
-
-class TokenRefreshRequest(BaseModel):
-    refresh: str 
-
-class TokenResponse(BaseModel):
-    access: str
-    refresh: str = None  
 
     
 def authenticate_user(token: str = Depends(oauth2_scheme)):

@@ -22,9 +22,14 @@ import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 
 const primarynavList = [
+  // {
+  //   link: "/dashboard",
+  //   label: "Dashboard",
+  //   icon: <DashboardIcon />,
+  // },
   {
-    link: "/dashboard",
-    label: "Dashboard",
+    link: "/user-dashboard",
+    label: "User Dashboard",
     icon: <DashboardIcon />,
   },
   {
@@ -33,25 +38,20 @@ const primarynavList = [
     icon: <InsertChartIcon />,
   },
   {
-    link: "/user-dashboard",
-    label: "User Dashboard",
-    icon: <DashboardIcon />,
-  },
-  {
     link: "/profile",
     label: "Doctor Profile",
     icon: <AccountCircleIcon />,
   },
-  {
-    link: "/doctor-list",
-    label: "Doctor List",
-    icon: <PeopleIcon />,
-  },
-  {
-    link: "/patient-list",
-    label: "Patient List",
-    icon: <SickIcon />,
-  },
+  // {
+  //   link: "/doctor-list",
+  //   label: "Doctor List",
+  //   icon: <PeopleIcon />,
+  // },
+  // {
+  //   link: "/patient-list",
+  //   label: "Patient List",
+  //   icon: <SickIcon />,
+  // },
   {
     link: "/appointments",
     label: "Appointments",

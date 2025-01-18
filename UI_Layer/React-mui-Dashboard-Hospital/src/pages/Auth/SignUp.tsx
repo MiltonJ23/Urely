@@ -4,7 +4,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
 import Grid from "@mui/material/Grid";
 import Box from "@mui/material/Box";
 import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
@@ -28,9 +28,11 @@ export default function SignUp() {
     control
   } = useForm<FormValues>();
 
+  const navigate = useNavigate();
+
   const onSubmit = async (data: FormValues) => {
     try {
-      const response = await fetch("http://localhost:5000/api/auth/register", {
+      const response = await fetch("http://localhost:8000/api/auth/register/", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
@@ -47,7 +49,8 @@ export default function SignUp() {
 
       const responseData = await response.json();
       console.log("Registration successful:", responseData);
-      alert("Registration successful! Please log in.");
+      alert("Registration successful!");
+      navigate('/user-dashboard')
     } catch (error) {
       console.error("Error during registration:", error);
       alert("An error occurred while registering. Please try again.");

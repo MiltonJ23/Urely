@@ -5,7 +5,6 @@ import speech_recognition as sr
 app = FastAPI()
 
 
-
 @app.get("/record-audio/")
 def record_audio():
     """

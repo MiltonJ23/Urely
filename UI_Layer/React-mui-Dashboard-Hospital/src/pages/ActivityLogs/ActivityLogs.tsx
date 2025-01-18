@@ -1,64 +1,38 @@
-import * as React from "react";
+import React, { useEffect, useState } from "react";
+import axios from "axios";
 import Box from "@mui/material/Box";
 import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
 import Grid from "@mui/material/Grid";
 import Paper from "@mui/material/Paper";
-import PieChart from "./PieChart";
-import BarChart from "./BarChart";
-import OrganData from "./OrganData";
-import HealthCard from "./HealthCard";
-import LatestAppointments from "./LatestAppointments";
 import Appbar from "../../components/Appbar";
+import HealthCard from "./HealthCard";
 
 import LocalDrinkIcon from "@mui/icons-material/LocalDrink";
 import DirectionsRunIcon from "@mui/icons-material/DirectionsRun";
 import MedicationLiquidIcon from "@mui/icons-material/MedicationLiquid";
 import LunchDiningIcon from "@mui/icons-material/LunchDining";
-const cardData = [
-  {
-    icon: <LocalDrinkIcon />,
-    title: "Water Intake",
-    value: 500,
-    unit: "ml / 2L",
-  },
-  {
-    icon: <DirectionsRunIcon />,
-    title: "Exercise",
-    value: 30,
-    unit: " min / 60 min",
-  },
-  {
-    icon: <MedicationLiquidIcon />,
-    title: "Medication",
-    value: 1,
-    unit: " pil / 1 pi",
-  },
-  {
-    icon: <LunchDiningIcon />,
-    title: "Food Intake",
-    value: "500",
-    unit: " kal / 2000 kal",
-  },
-];
 
-const chartData = [
-  { chartName: <PieChart /> },
-  { chartName: <BarChart /> },
-  //{ chartName: <OrganData /> }
-];
+const ActivityLogs = () => {
+  interface Log {
+    water_intake: number;
+    exercise_duration: number;
+    medication_count: number;
+    food_intake: number;
+  }
 
-import React, { useEffect, useState } from "react";
-import axios from "axios";
-
-export default function ActivityLogs() {
-  const [logs, setLogs] = useState([]);
+  const [logs, setLogs] = useState<Log[]>([]);
   const [loading, setLoading] = useState(true);
 
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const response = await axios.get("/api/activity-logs");
+        const token = localStorage.getItem("authToken"); // Assuming the token is stored in localStorage
+        const response = await axios.get("http://localhost:8000/api/health/activity-logs/", {
+          headers: {
+            Authorization: `Bearer ${token}`,
+          },
+        });
         setLogs(response.data);
       } catch (error) {
         console.error("Error fetching activity logs", error);
@@ -68,6 +42,7 @@ export default function ActivityLogs() {
     };
     fetchLogs();
   }, []);
+  
 
   if (loading) return <div>Loading...</div>;
 
@@ -89,13 +64,14 @@ export default function ActivityLogs() {
         <Container sx={{ mt: 4, mb: 4 }}>
           <Grid container spacing={3}>
             {logs.map((log, index) => (
-              <Grid key={index} item xs={12} md={4} lg={3}>
+              <Grid key={index} item xs={12} md={6} lg={4}>
                 <Paper
                   sx={{
                     p: 2,
                     display: "flex",
                     flexDirection: "column",
-                    height: 200,
+                    height: 280,
+                    justifyContent: "space-between",
                   }}
                 >
                   <HealthCard
@@ -114,7 +90,7 @@ export default function ActivityLogs() {
                     icon={<MedicationLiquidIcon />}
                     title="Medication"
                     value={log.medication_count}
-                    unit="pil / 1 pi"
+                    unit="pill / 1 pill"
                   />
                   <HealthCard
                     icon={<LunchDiningIcon />}
@@ -130,4 +106,6 @@ export default function ActivityLogs() {
       </Box>
     </Box>
   );
-}
+};
+
+export default ActivityLogs;

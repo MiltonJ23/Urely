@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'rest_framework',
     'rest_framework_simplejwt.token_blacklist',
     'corsheaders',
+    'django_extensions',
     'user',
     'health',
     'appointments'
@@ -95,9 +96,16 @@ CORS_ALLOW_HEADERS = list(default_headers) + [
     'Authorization',
 ]
 
+# Allow requests from your frontend origin
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:3000",  # Add your frontend's origin
+]
+
 # CSRF settings 
 CSRF_COOKIE_SECURE = True  
-SESSION_COOKIE_SECURE = True  
+SESSION_COOKIE_SECURE = True
+
+CORS_ALLOW_CREDENTIALS = True
 
 # Password validation
 # https://docs.djangoproject.com/en/4.2/ref/settings/#auth-password-validators
