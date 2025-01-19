@@ -27,7 +27,7 @@ const ActivityLogs = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const token = localStorage.getItem("authToken");
+        const token = sessionStorage.getItem("authToken");
         if (!token) {
           throw new Error("No authentication token found.");
         }

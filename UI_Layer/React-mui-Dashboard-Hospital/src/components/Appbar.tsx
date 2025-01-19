@@ -11,6 +11,7 @@ import Avatar from "@mui/material/Avatar";
 import ChevronLeftIcon from "@mui/icons-material/ChevronLeft";
 import NotificationsIcon from "@mui/icons-material/Notifications";
 import { mainListItems, secondaryListItems } from "./listItems";
+import { primarynavList, secondaryNavList } from "./listItems";
 import Tooltip from "@mui/material/Tooltip";
 import MenuItem from "@mui/material/MenuItem";
 import Menu from "@mui/material/Menu";
@@ -19,6 +20,11 @@ import { settings } from "../constant";
 import { AppBar, Drawer } from "../styles";
 
 export default function Appbar(props: { appBarTitle: string }) {
+  const [user, setUser] = React.useState<{
+    last_name: string;
+    first_name: string;
+    name: string;
+  } | null>(null);
   const [open, setOpen] = React.useState(true);
   const [anchorElUser, setAnchorElUser] = React.useState<null | HTMLElement>(
     null
@@ -34,12 +40,36 @@ export default function Appbar(props: { appBarTitle: string }) {
     setAnchorElUser(null);
   };
 
+  React.useEffect(() => {
+    const fetchUser = async () => {
+      const token = sessionStorage.getItem("authToken");
+      const response = await fetch("http://localhost:8000/api/auth/get-user/", {
+        method: "GET",
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      const userDetails = await response.json();
+
+      setUser(userDetails);
+    };
+    fetchUser();
+  }, []);
+
+  const getUserInitials = (name: string) => {
+    return name
+      .split(" ")
+      .map((n) => n[0])
+      .join("")
+      .toUpperCase();
+  };
+
   return (
     <Box sx={{ display: "flex" }}>
       <AppBar position="absolute" open={open}>
         <Toolbar
           sx={{
-            pr: "24px" // keep right padding when drawer closed
+            pr: "24px", // keep right padding when drawer closed
           }}
         >
           <IconButton
@@ -49,7 +79,7 @@ export default function Appbar(props: { appBarTitle: string }) {
             onClick={toggleDrawer}
             sx={{
               marginRight: "36px",
-              ...(open && { display: "none" })
+              ...(open && { display: "none" }),
             }}
           >
             <MenuIcon />
@@ -83,7 +113,11 @@ export default function Appbar(props: { appBarTitle: string }) {
                 color="inherit"
                 onClick={handleOpenUserMenu}
               >
-                <Avatar alt="Remy Sharp" src="/static/images/avatar/2.jpg" />
+                <Avatar sx={{ bgcolor: "brown", color: "white" }}>
+                  {user
+                    ? getUserInitials(user.first_name + " " + user.last_name)
+                    : ""}
+                </Avatar>
               </IconButton>
             </Tooltip>
             <Menu
@@ -92,12 +126,12 @@ export default function Appbar(props: { appBarTitle: string }) {
               anchorEl={anchorElUser}
               anchorOrigin={{
                 vertical: "top",
-                horizontal: "right"
+                horizontal: "right",
               }}
               keepMounted
               transformOrigin={{
                 vertical: "top",
-                horizontal: "right"
+                horizontal: "right",
               }}
               open={Boolean(anchorElUser)}
               onClose={handleCloseUserMenu}
@@ -122,7 +156,7 @@ export default function Appbar(props: { appBarTitle: string }) {
             display: "flex",
             alignItems: "center",
             justifyContent: "space-between",
-            px: [1]
+            px: [1],
           }}
         >
           <Typography variant="h4" align="center">
@@ -135,9 +169,9 @@ export default function Appbar(props: { appBarTitle: string }) {
         </Toolbar>
         <Divider />
         <List component="nav">
-          {mainListItems}
+          {mainListItems({ primarynavList })}
           <Divider sx={{ my: 1 }} />
-          {secondaryListItems}
+          {secondaryListItems({ secondaryNavList })}
         </List>
       </Drawer>
     </Box>

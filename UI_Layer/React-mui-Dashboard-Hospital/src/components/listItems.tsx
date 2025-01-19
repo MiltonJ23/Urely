@@ -1,5 +1,5 @@
 import * as React from "react";
-import { Link } from "react-router-dom";
+import { Link, useLocation } from "react-router-dom";
 import ListItemButton from "@mui/material/ListItemButton";
 import ListItemIcon from "@mui/material/ListItemIcon";
 import ListItemText from "@mui/material/ListItemText";
@@ -21,12 +21,7 @@ import ViewKanbanIcon from "@mui/icons-material/ViewKanban";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
 import InsertChartIcon from '@mui/icons-material/InsertChart';
 
-const primarynavList = [
-  // {
-  //   link: "/dashboard",
-  //   label: "Dashboard",
-  //   icon: <DashboardIcon />,
-  // },
+export const primarynavList = [
   {
     link: "/user-dashboard",
     label: "User Dashboard",
@@ -42,16 +37,6 @@ const primarynavList = [
     label: "Doctor Profile",
     icon: <AccountCircleIcon />,
   },
-  // {
-  //   link: "/doctor-list",
-  //   label: "Doctor List",
-  //   icon: <PeopleIcon />,
-  // },
-  // {
-  //   link: "/patient-list",
-  //   label: "Patient List",
-  //   icon: <SickIcon />,
-  // },
   {
     link: "/appointments",
     label: "Appointments",
@@ -62,11 +47,6 @@ const primarynavList = [
     label: "Calender",
     icon: <CalendarMonthIcon />,
   },
-  // {
-  //   link: "/kanban",
-  //   label: "Kanban",
-  //   icon: <ViewKanbanIcon />,
-  // },
   {
     link: "/account",
     label: "Account",
@@ -74,12 +54,7 @@ const primarynavList = [
   },
 ];
 
-const secondaryNavList = [
-  {
-    link: "/lab-results",
-    label: "Lab Results",
-    icon: <ReceiptLongIcon />,
-  },
+export const secondaryNavList = [
   {
     link: "/medical-records",
     label: "Medical Records",
@@ -91,65 +66,148 @@ const secondaryNavList = [
     icon: <AssignmentTurnedInIcon />,
   },
   {
-    link: "/plans",
-    label: "Care Plans",
-    icon: <AssignmentIcon />,
-  },
-  {
-    link: "/forms",
-    label: "Forms",
-    icon: <DescriptionIcon />,
-  },
-  {
     link: "/help",
     label: "Get Help",
     icon: <HelpIcon />,
   },
   {
-    link: "/settings",
-    label: "Settings",
-    icon: <SettingsIcon />,
-  },
-  {
     link: "/login",
     label: "Logout",
     icon: <LogoutIcon />,
+    // Adding onClick function to handle logout
+    onClick: async () => {
+      try {
+        const token = sessionStorage.getItem("authToken");
+        if (!token) {
+          console.log("No token found");
+          return;
+        }
+    
+        // Send a POST request to logout with only the Authorization header
+        const response = await fetch("http://localhost:8000/api/auth/logout/", {
+          method: "POST",
+          headers: {
+            "Authorization": `Bearer ${token}`, // Add token to the header
+            "Content-Type": "application/json",  // Ensure content type is set to JSON if required
+          },
+          body: JSON.stringify({refresh: sessionStorage.getItem('refreshToken')})  // Send an empty body if the API expects it
+        });
+    
+        if (!response.ok) {
+          throw new Error('Logout failed');
+        }
+    
+        // Clear token after logout
+        sessionStorage.removeItem("authToken");
+        window.location.href = "/login";  // Redirect to login page after logout
+      } catch (error) {
+        console.error("Logout failed:", error);
+      }
+    }
   },
 ];
 
-export const mainListItems = (
-  <React.Fragment>
-    {primarynavList.map((data: any, index: any) => (
-      <Link
-        key={index}
-        to={data.link}
-        style={{ textDecoration: "none", color: "inherit" }}
-      >
-        <ListItemButton>
-          <ListItemIcon>{data.icon}</ListItemIcon>
-          <ListItemText primary={data.label} />
-        </ListItemButton>
-      </Link>
-    ))}
-  </React.Fragment>
-);
+export interface NavItem {
+  onClick?: any;
+  link: string;
+  label: string;
+  icon: React.ReactNode;
+}
 
-export const secondaryListItems = (
-  <React.Fragment>
-    <ListSubheader component="div" inset>
-      Saved reports
-    </ListSubheader>
-    {secondaryNavList.map((data: any, index: any) => (
-      <Link
-        key={index}
-        to={data.link}
-        style={{ textDecoration: "none", color: "inherit" }}
-      >
-        <ListItemButton>
-          <ListItemIcon>{data.icon}</ListItemIcon>
-          <ListItemText primary={data.label} />
-        </ListItemButton>
-      </Link>
-    ))}
-  </React.Fragment>
-);
+const mainListItems = ({ primarynavList }: { primarynavList: NavItem[] }) => {
+  const location = useLocation();
+
+  return (
+    <React.Fragment>
+      {primarynavList.map((data, index) => (
+        <Link
+          key={index}
+          to={data.link}
+          style={{ textDecoration: "none", color: "inherit" }}
+        >
+          <ListItemButton
+            selected={location.pathname === data.link} // Highlights the active route
+            sx={{
+              "&.Mui-selected": {
+                backgroundColor: "rgba(0, 0, 255, 0.1)", // Light blue for active route
+                color: "blue",
+              },
+              "&.Mui-selected:hover": {
+                backgroundColor: "rgba(0, 0, 255, 0.2)", // Slightly darker on hover
+              },
+            }}
+          >
+            <ListItemIcon
+              sx={{
+                color: location.pathname === data.link ? "blue" : "inherit", // Icon color for active route
+              }}
+            >
+              {data.icon}
+            </ListItemIcon>
+            <ListItemText primary={data.label} />
+          </ListItemButton>
+        </Link>
+      ))}
+    </React.Fragment>
+  );
+};
+
+const secondaryListItems = ({ secondaryNavList }: { secondaryNavList: NavItem[] }) => {
+  const location = useLocation();
+
+  return (
+    <React.Fragment>
+      <ListSubheader component="div" inset>
+        Saved reports
+      </ListSubheader>
+      {secondaryNavList.map((data, index) => (
+        <div key={index}>
+          {data.link === "/login" ? (
+            <ListItemButton
+              onClick={data.onClick}
+              style={{
+                backgroundColor: "red",
+                color: "white",
+                borderRadius: "4px", // Optional: Adds rounded corners
+                marginTop: "10px", // Optional: Adds some spacing for better UI
+              }}
+            >
+              <ListItemIcon style={{ color: "white" }}>{data.icon}</ListItemIcon>
+              <ListItemText primary={data.label} style={{ color: "white" }} />
+            </ListItemButton>
+          ) : (
+            <Link
+              key={index}
+              to={data.link}
+              style={{ textDecoration: "none", color: "inherit" }}
+            >
+              <ListItemButton
+                selected={location.pathname === data.link} // Highlights the active route
+                sx={{
+                  "&.Mui-selected": {
+                    backgroundColor: "rgba(0, 0, 255, 0.1)", // Light blue for active route
+                    color: "blue",
+                  },
+                  "&.Mui-selected:hover": {
+                    backgroundColor: "rgba(0, 0, 255, 0.2)", // Slightly darker on hover
+                  },
+                }}
+              >
+                <ListItemIcon
+                  sx={{
+                    color: location.pathname === data.link ? "blue" : "inherit",
+                  }}
+                >
+                  {data.icon}
+                </ListItemIcon>
+                <ListItemText primary={data.label} />
+              </ListItemButton>
+            </Link>
+          )}
+        </div>
+      ))}
+    </React.Fragment>
+  );
+};
+
+export { mainListItems, secondaryListItems };

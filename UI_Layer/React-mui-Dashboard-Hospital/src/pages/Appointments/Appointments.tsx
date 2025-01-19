@@ -7,27 +7,20 @@ import AppointmentDialog from "./AppointmentDialog";
 import { appointmentsData } from "../../mockData";
 import AppointmentTableData from "./AppointmentTableData";
 import axios from "axios";
+import apiClient from "../../components/ApiClient";
 
 function Appointments() {
   const [appointments, setAppointments] = useState([]);
 
   const fetchAppointments = async () => {
-    const token = localStorage.getItem("authToken");
-  
-    if (!token) {
-      console.error("No token found");
-      return;
-    }
-  
     try {
-      console.log("Fetching appointments...");
-      const response = await axios.get("http://localhost:8000/api/appointments/", {
+      const token = sessionStorage.getItem("authToken");
+      const response = await apiClient.get("/appointments/", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
       console.log(response.data);
-      setAppointments(response.data);
     } catch (error) {
       console.error("Failed to fetch appointments:", error);
     }

@@ -1,4 +1,4 @@
-import * as React from "react";
+import {Suspense, useEffect} from "react";
 import { createTheme, ThemeProvider } from "@mui/material/styles";
 import CssBaseline from "@mui/material/CssBaseline";
 import { RouterProvider } from "react-router-dom";
@@ -8,16 +8,24 @@ import { router } from "./router";
 import CircularProgress from "@mui/material/CircularProgress";
 import Box from "@mui/material/Box";
 import { useThemeStore } from "./store/themeStore";
+import useTokenHandler from "./components/removeToken";
 
 //const Theme = createTheme(themeOptions);
 
 export default function App() {
   const { theme } = useThemeStore();
+  const { initializeInterceptor, snackbarComponent } = useTokenHandler();
+
+  useEffect(() => {
+    initializeInterceptor(); // Initialize Axios interceptor
+  }, []);
+
 
   return (
     <ThemeProvider theme={createTheme(theme)}>
+      {snackbarComponent}
       <CssBaseline />
-      <React.Suspense
+      <Suspense
         fallback={
           <Box sx={{ display: "flex" }}>
             <CircularProgress />
@@ -26,7 +34,7 @@ export default function App() {
       >
         <RouterProvider router={router} />
         {/* <StickyFooter /> */}
-      </React.Suspense>
+      </Suspense>
     </ThemeProvider>
   );
 }

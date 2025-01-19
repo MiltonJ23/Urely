@@ -1,5 +1,5 @@
 export const getUserDetails = async () => {
-    const token = localStorage.getItem("authToken");  // Get the token from localStorage or cookies
+    const token = sessionStorage.getItem("authToken");  
   
     if (!token) {
       console.error("Token is missing");

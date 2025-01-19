@@ -12,6 +12,7 @@ import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { useForm } from "react-hook-form";
 import { DevTool } from "@hookform/devtools";
+import axios from "axios";
 
 type FormValues = {
   firstName: string;
@@ -25,32 +26,36 @@ export default function SignUp() {
     register,
     handleSubmit,
     formState: { errors },
-    control
+    control,
   } = useForm<FormValues>();
 
   const navigate = useNavigate();
 
+  const domain_name = "http://localhost";
+
   const onSubmit = async (data: FormValues) => {
     try {
-      const response = await fetch("http://localhost:8000/api/auth/register/", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify(data),
+      const response = await axios.post(`${domain_name}:8000/api/auth/register/`, {
+        first_name: data.firstName,
+        last_name: data.lastName,
+        email: data.email,
+        password: data.password,
       });
 
-      if (!response.ok) {
-        const errorData = await response.json();
-        console.error("Registration failed:", errorData.message);
-        alert(`Registration failed: ${errorData.message}`);
+      // Check if the response status is successful (status code 200-299)
+      if (response.status < 200 || response.status >= 300) {
+        console.error("Registration failed:", response.statusText);
+        alert(`Registration failed: ${response.statusText}`);
         return;
       }
 
-      const responseData = await response.json();
+      // Log and alert registration success
+      const responseData = response.data;
       console.log("Registration successful:", responseData);
       alert("Registration successful!");
-      navigate('/user-dashboard')
+
+      // Navigate to the user dashboard
+      navigate("/user-dashboard");
     } catch (error) {
       console.error("Error during registration:", error);
       alert("An error occurred while registering. Please try again.");

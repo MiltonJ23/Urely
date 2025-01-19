@@ -3,13 +3,17 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from django.conf import settings
-from datetime import timedelta
+from datetime import timedelta, date
 
 
 class Doctor(models.Model):
     name = models.CharField(max_length=100)
     specialty = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
+    description = models.CharField(max_length=500)
+    experience = models.IntegerField(default=0)
+    patients_count = models.PositiveBigIntegerField(default=0)
+    image = models.ImageField(upload_to='doctors/', default='doctors/default.png')
 
     def __str__(self):
         return self.name
@@ -54,16 +58,30 @@ class WorkingHour(models.Model):
 
 
 class Appointment(models.Model):
-    user = models.ForeignKey(settings.AUTH_USER_MODEL, on_delete=models.CASCADE)
-    doctor = models.ForeignKey(Doctor, on_delete=models.CASCADE)
-    date = models.DateTimeField()
-    status_choices = [
-        ('pending', 'Pending'),
-        ('confirmed', 'Confirmed'),
-        ('completed', 'Completed'),
-        ('cancelled', 'Cancelled'),
+    GENDER_CHOICES = [
+        ('Male', 'Male'),
+        ('Female', 'Female'),
+        ('Other', 'Other'),
     ]
-    status = models.CharField(max_length=10, choices=status_choices, default='pending')
+
+    full_name = models.CharField(max_length=255)
+    gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
+    phone = models.CharField(max_length=15, default='')  # To handle various phone formats
+    age = models.PositiveIntegerField(default=0)
+    appointment_date = models.DateField(default=date.today)
+    referred_by_doctor = models.CharField(max_length=255, blank=True, null=True)
+    assigned_doctor = models.CharField(max_length=255, null=True, blank=True)
+    user = models.ForeignKey(
+        settings.AUTH_USER_MODEL,
+        on_delete=models.CASCADE,
+        related_name="appointments",
+        blank=True,
+        null=True,
+    )
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     def __str__(self):
-        return f"Appointment with {self.doctor.name} on {self.date}"
+        return f"{self.full_name} - {self.appointment_date}"
+    
+

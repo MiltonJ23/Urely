@@ -1,26 +1,26 @@
 import * as React from "react";
-import Button from "@mui/material/Button";
-import TextField from "@mui/material/TextField";
-import Dialog from "@mui/material/Dialog";
-import DialogActions from "@mui/material/DialogActions";
-import DialogContent from "@mui/material/DialogContent";
-import DialogTitle from "@mui/material/DialogTitle";
-import Slide from "@mui/material/Slide";
+import {
+  Button,
+  TextField,
+  Dialog,
+  DialogActions,
+  DialogContent,
+  DialogTitle,
+  Slide,
+  Stack,
+  InputLabel,
+  MenuItem,
+  FormControl,
+  Select,
+} from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
-import { Stack } from "@mui/material";
 import AddIcon from "@mui/icons-material/Add";
 import SearchInput from "../../components/SearchInput";
 import { useForm } from "react-hook-form";
-import { DemoContainer } from "@mui/x-date-pickers/internals/demo";
-import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
 import { LocalizationProvider } from "@mui/x-date-pickers/LocalizationProvider";
 import { DatePicker } from "@mui/x-date-pickers/DatePicker";
-import InputLabel from "@mui/material/InputLabel";
-import MenuItem from "@mui/material/MenuItem";
-import FormControl from "@mui/material/FormControl";
-import Select from "@mui/material/Select";
-import axios from "axios"; // Import axios for making API requests
-import { getUserDetails } from "../../store/user";
+import { AdapterDayjs } from "@mui/x-date-pickers/AdapterDayjs";
+import axios from "axios";
 
 type FormValues = {
   id: string;
@@ -34,9 +34,7 @@ type FormValues = {
 };
 
 const Transition = React.forwardRef(function Transition(
-  props: TransitionProps & {
-    children: React.ReactElement<any, any>;
-  },
+  props: TransitionProps & { children: React.ReactElement },
   ref: React.Ref<unknown>
 ) {
   return <Slide direction="up" ref={ref} {...props} />;
@@ -47,44 +45,45 @@ export default function AppointmentDialog({
   setAppointments,
 }: any) {
   const [open, setOpen] = React.useState(false);
-  const [userData, setUserData] = React.useState<any>(null); // State to store the fetched user data
+  const [userData, setUserData] = React.useState<any>(null);
+  const [appointmentDate, setAppointmentDate] = React.useState<string | null>(
+    null
+  );
 
   const {
     register,
     handleSubmit,
-    setValue, // useForm method to set field values
+    setValue,
     formState: { errors },
   } = useForm<FormValues>();
 
-
-  // Fetch the user data (e.g., full name) when the component is mounted
   React.useEffect(() => {
     const fetchUserData = async () => {
-      const token = localStorage.getItem("authToken");
+      const token = sessionStorage.getItem("authToken");
       try {
-        // Assuming you have an API endpoint that returns user data
-        const response = await fetch("http://localhost:8000/api/auth/get-user/", {
-          method: "GET",
-          headers: {
-            "Authorization": `Bearer ${token}`,
-          },
-        });
-        const user = await response.json();
+        const response = await fetch(
+          "http://localhost:8000/api/auth/get-user/",
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
 
-        // Set the fetched data into the form fields
+        const user = await response.json();
         setUserData(user);
-        console.log(user);
-        setValue("fullName", user.first_name + user.last_name); // Prepopulate full name
-        console.log(user.first_name + user.last_name);
-        
-        setValue("gender", user.profile.gender); // Optionally set other fields
+
+        // Prepopulate form fields
+        setValue("fullName", `${user.first_name} ${user.last_name}`);
+        setValue("gender", user.profile.gender || ""); // Default to empty if undefined
       } catch (error) {
         console.error("Error fetching user data:", error);
       }
     };
 
     fetchUserData();
-  }, [setValue]); // Re-run only when the component mounts
+  }, [setValue]);
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -95,21 +94,47 @@ export default function AppointmentDialog({
   };
 
   const onSubmit = async (data: FormValues) => {
-    // Set the ID manually if needed
-    data.id = appointments.length + 1;
+    // Validate that the appointmentDate is set
+    if (!appointmentDate) {
+      alert("Appointment Date is required");
+      return;
+    }
+
+    // Append the appointmentDate to the form data
+    const completeData = {
+      ...data,
+      appointmentDate, // Add the selected date
+      id: (appointments.length + 1).toString(), // Generate a new ID
+    };
+
+    const token = sessionStorage.getItem("authToken"); // Retrieve token from sessionStorage
+
+    if (!token) {
+      alert("User not authenticated. Please log in again.");
+      return;
+    }
 
     try {
-      // Send the data to the backend
-      await axios.post("http://your-api-endpoint/api/appointments", data);
+      // POST the complete data to the backend
+      await axios.post(
+        "http://localhost:8000/api/appointments/create/",
+        completeData,
+        {
+          headers: {
+            Authorization: `Bearer ${token}`, // Add the Authorization header
+            "Content-Type": "application/json", // Ensure the content type is JSON
+          },
+        }
+      );
 
-      // Update the state if the POST request is successful
-      setAppointments((prevState: any) => [...prevState, data]);
+      // Update state with the new appointment
+      setAppointments((prevState: any) => [...prevState, completeData]);
 
-      // Close the dialog
+      // Close the dialog on success
       handleClose();
     } catch (error) {
       console.error("Error adding appointment:", error);
-      // Handle the error, maybe show a notification or alert
+      alert("Failed to book the appointment. Please try again.");
     }
   };
 
@@ -137,50 +162,42 @@ export default function AppointmentDialog({
         TransitionComponent={Transition}
         maxWidth="xs"
         fullWidth
-        sx={{ height: "100%" }}
       >
         <form onSubmit={handleSubmit(onSubmit)}>
           <DialogTitle>Appointment Details</DialogTitle>
-
           <DialogContent dividers>
             <TextField
               margin="dense"
               id="fullName"
               label="Full Name"
-              type="fullName"
               fullWidth
               variant="outlined"
-              defaultValue={userData?.fullName} // Prepopulate with fetched data
-              {...register("fullName", {
-                required: "Name is required",
-              })}
+              {...register("fullName", { required: "Name is required" })}
               error={!!errors.fullName}
               helperText={errors.fullName?.message}
             />
             <FormControl fullWidth margin="dense">
-              <InputLabel id="gender">Gender</InputLabel>
+              <InputLabel id="gender-label">Gender</InputLabel>
               <Select
-                labelId="gender"
+                labelId="gender-label"
                 id="gender"
-                label="Gender"
-                {...register("gender")}
+                defaultValue=""
+                {...register("gender", { required: "Gender is required" })}
+                error={!!errors.gender}
               >
-                <MenuItem value={"Male"}>Male</MenuItem>
-                <MenuItem value={"Female"}>Female</MenuItem>
-                <MenuItem value={"Other"}>Other</MenuItem>
+                <MenuItem value="Male">Male</MenuItem>
+                <MenuItem value="Female">Female</MenuItem>
+                <MenuItem value="Other">Other</MenuItem>
               </Select>
             </FormControl>
             <TextField
               margin="dense"
               id="phone"
               label="Phone no"
-              type="phone"
               fullWidth
               variant="outlined"
-              placeholder="0 123456789"
-              {...register("phone", {
-                required: "Phone no is required",
-              })}
+              placeholder="e.g., 123456789"
+              {...register("phone", { required: "Phone number is required" })}
               error={!!errors.phone}
               helperText={errors.phone?.message}
             />
@@ -188,39 +205,29 @@ export default function AppointmentDialog({
               margin="dense"
               id="age"
               label="Age"
-              type="age"
               fullWidth
               variant="outlined"
-              placeholder="ex: 18"
-              {...register("age", {
-                required: "Age is required",
-              })}
+              placeholder="e.g., 25"
+              {...register("age", { required: "Age is required" })}
               error={!!errors.age}
               helperText={errors.age?.message}
             />
             <LocalizationProvider dateAdapter={AdapterDayjs}>
-              <DemoContainer components={["DatePicker"]}>
-                <DatePicker
-                  label="Appointment Date"
-                  sx={{ width: "100%" }}
-                  slotProps={{
-                    textField: {
-                      helperText: "Date is required",
-                    },
-                  }}
-                />
-              </DemoContainer>
+              <DatePicker
+                label="Appointment Date"
+                value={appointmentDate}
+                onChange={(newValue) => setAppointmentDate(newValue)}
+              />
+              ;
             </LocalizationProvider>
             <TextField
               margin="dense"
               id="referredByDoctor"
               label="Referred By Doctor"
-              type="referredByDoctor"
               fullWidth
               variant="outlined"
-              placeholder="ex: Dr. Smith"
               {...register("referredByDoctor", {
-                required: "Specialist is required",
+                required: "Referred By Doctor is required",
               })}
               error={!!errors.referredByDoctor}
               helperText={errors.referredByDoctor?.message}
@@ -229,10 +236,8 @@ export default function AppointmentDialog({
               margin="dense"
               id="assignedDoctor"
               label="Assigned Doctor"
-              type="assignedDoctor"
               fullWidth
               variant="outlined"
-              placeholder="ex: Dr. Smith"
               {...register("assignedDoctor", {
                 required: "Assigned Doctor is required",
               })}

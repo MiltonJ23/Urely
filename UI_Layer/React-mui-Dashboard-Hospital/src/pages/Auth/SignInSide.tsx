@@ -17,6 +17,7 @@ import axios from "axios";
 import { Divider } from "@mui/material";
 import HeartRateLoader from "../../components/HeartRateLoader";
 import { useForm } from "react-hook-form";
+import isTokenExpired from "../../components/token";
 
 type FormValues = {
   email: string;
@@ -205,7 +206,6 @@ type FormValues = {
 //   );
 // }
 
-
 export default function SignInSide() {
   const [showPassword, setShowPassword] = React.useState(false);
   const [loading, setLoading] = React.useState(false);
@@ -219,25 +219,39 @@ export default function SignInSide() {
   const domain_name = "http://localhost";
 
   const onSubmit = async (data: FormValues) => {
-    setLoading(true);
-
     try {
-      // Step 1: Request login and get access token
-      const loginResponse = await axios.post(`${domain_name}:8000/api/auth/token/`, {
+      const response = await axios.post(`${domain_name}:8000/api/auth/token/`, {
         email: data.email,
         password: data.password,
       });
 
-      const { access, refresh } = loginResponse.data;
+      // Check if login was successful
+      if (response.status !== 200) {
+        console.error("Login failed:", response.statusText);
+        alert(`Login failed: ${response.statusText}`);
+        return;
+      }
 
-      // Store tokens in localStorage
-      localStorage.setItem("authToken", access);
-      localStorage.setItem("refreshToken", refresh);
+      const { access, refresh } = response.data;
 
-      // Step 2: Verify token and get user details
+      // Store tokens in sessionStorage 
+      sessionStorage.setItem("authToken", access);
+      sessionStorage.setItem("refreshToken", refresh);
+
+      // Step 2: Verify token
       const verifyResponse = await axios.post(
         `${domain_name}:8000/api/auth/token/verify/`,
-        {},
+        { token: access },
+        {
+          headers: {
+            Authorization: `Bearer ${access}`, // Ensure token is sent properly in the header
+          },
+        }
+      );
+
+      // Step 3: Fetch user details
+      const userResponse = await axios.get(
+        `${domain_name}:8000/api/auth/get-user/`,
         {
           headers: {
             Authorization: `Bearer ${access}`,
@@ -245,27 +259,22 @@ export default function SignInSide() {
         }
       );
 
-      const userResponse = await axios.get(`${domain_name}:8000/api/auth/profile/`, {
-        headers: {
-          Authorization: `Bearer ${access}`,
-        },
-      });
-
-      const { is_superuser } = userResponse.data;
-
-      // Step 3: Role-based navigation
-      if (is_superuser) {
+      const { is_staff } = userResponse.data;
+      console.log("User details:", is_staff);
+      
+      // Navigate based on user role
+      if (is_staff) {
         navigate("/dashboard");
       } else {
         navigate("/user-dashboard");
       }
-    } catch (error: Error | any) {
-      console.error(error);
-      alert(
-        error.response?.data?.detail || "Invalid credentials or something went wrong."
-      );
-    } finally {
-      setLoading(false);
+    } catch (error: any) {
+      console.error("Error during login:", error);
+      if (error.response?.status === 401) {
+        alert("Invalid credentials or session expired. Please log in again.");
+      } else {
+        alert("An error occurred. Please try again.");
+      }
     }
   };
 
@@ -291,8 +300,24 @@ export default function SignInSide() {
               backgroundPosition: "center",
             }}
           />
-          <Grid item xs={12} sm={8} md={5} component={Paper} elevation={6} square>
-            <Box sx={{ my: 8, mx: 4, display: "flex", flexDirection: "column", alignItems: "center" }}>
+          <Grid
+            item
+            xs={12}
+            sm={8}
+            md={5}
+            component={Paper}
+            elevation={6}
+            square
+          >
+            <Box
+              sx={{
+                my: 8,
+                mx: 4,
+                display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
+              }}
+            >
               <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
                 <LockOutlinedIcon />
               </Avatar>
@@ -335,18 +360,29 @@ export default function SignInSide() {
                     control={<Checkbox value="remember" color="primary" />}
                     label="Remember me"
                   />
-                  <Button type="submit" fullWidth variant="contained" sx={{ mt: 3, mb: 2 }}>
+                  <Button
+                    type="submit"
+                    fullWidth
+                    variant="contained"
+                    sx={{ mt: 3, mb: 2 }}
+                  >
                     Sign In
                   </Button>
                 </form>
                 <Grid container>
                   <Grid item xs>
-                    <Link to={"/forgot"} style={{ textDecoration: "none", color: "inherit" }}>
+                    <Link
+                      to={"/forgot"}
+                      style={{ textDecoration: "none", color: "inherit" }}
+                    >
                       Forgot password?
                     </Link>
                   </Grid>
                   <Grid item>
-                    <Link to={"/signup"} style={{ textDecoration: "none", color: "inherit" }}>
+                    <Link
+                      to={"/signup"}
+                      style={{ textDecoration: "none", color: "inherit" }}
+                    >
                       {"Don't have an account? Sign Up"}
                     </Link>
                   </Grid>
@@ -354,11 +390,21 @@ export default function SignInSide() {
                 <Divider sx={{ mt: 2 }} light variant="middle">
                   OR
                 </Divider>
-                <Button fullWidth startIcon={<GoogleIcon />} variant="outlined" sx={{ mt: 2 }}>
+                <Button
+                  fullWidth
+                  startIcon={<GoogleIcon />}
+                  variant="outlined"
+                  sx={{ mt: 2 }}
+                >
                   Continue with Google
                 </Button>
 
-                <Button fullWidth startIcon={<FacebookIcon />} variant="outlined" sx={{ mt: 2 }}>
+                <Button
+                  fullWidth
+                  startIcon={<FacebookIcon />}
+                  variant="outlined"
+                  sx={{ mt: 2 }}
+                >
                   Continue with Facebook
                 </Button>
 

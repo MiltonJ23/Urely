@@ -12,11 +12,35 @@ import {
   TableRow
 } from "@mui/material";
 import { Avatar, Grid, Box } from "@mui/material";
-import { mockDoctorsData } from "../../mockData";
 import AddDoctorDialog from "./AddDoctorDialog";
+import axios from "axios"; // Import axios for making API requests
 
 export default function DoctorList() {
-  const [doctors, setDoctors] = React.useState(mockDoctorsData);
+  const [doctors, setDoctors] = React.useState<any[]>([]);
+  const [loading, setLoading] = React.useState<boolean>(true);  // For showing loading state
+  const [error, setError] = React.useState<string | null>(null);  // For handling errors
+
+  React.useEffect(() => {
+    const domain_name = 'htpp://localhost';
+    const fetchDoctors = async () => {
+      try {
+        const token = sessionStorage.getItem("authToken");
+        const response = await axios.get(`${domain_name}:8000/api/appointments/doctors/`, {
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+        setDoctors(response.data); 
+      } catch (err: any) {
+        console.error("Error fetching doctors:", err);
+        setError("Failed to load doctors. Please try again.");
+      } finally {
+        setLoading(false);  // Stop the loading state once the data is fetched
+      }
+    };
+
+    fetchDoctors();
+  }, []);  // Fetch doctors when the component mounts
 
   return (
     <Box sx={{ display: "flex" }}>
@@ -37,20 +61,18 @@ export default function DoctorList() {
 
         <Container sx={{ mt: 4, mb: 4 }}>
           <AddDoctorDialog
-            mockData={mockDoctorsData}
             doctors={doctors}
             setDoctors={setDoctors}
           />
           <Grid
             container
             spacing={2}
-            sx={{ marginleft: "10px", marginTop: "40px" }}
+            sx={{ marginLeft: "10px", marginTop: "40px" }}
           >
             <TableContainer component={Paper}>
-              <Table sx={{ minWidth: 650 }} aria-label="patient table">
+              <Table sx={{ minWidth: 650 }} aria-label="doctor table">
                 <TableHead>
                   <TableRow>
-                    {/* <TableCell align="center">#</TableCell> */}
                     <TableCell></TableCell>
                     <TableCell>DOCTOR NAME</TableCell>
                     <TableCell>SPECIALIST</TableCell>
@@ -60,19 +82,24 @@ export default function DoctorList() {
                   </TableRow>
                 </TableHead>
                 <TableBody>
-                  {doctors.length > 0 &&
-                    doctors.map((doctor: any, index: any) => (
+                  {loading ? (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center">Loading...</TableCell>
+                    </TableRow>
+                  ) : error ? (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center">{error}</TableCell>
+                    </TableRow>
+                  ) : doctors.length > 0 ? (
+                    doctors.map((doctor: any, index: number) => (
                       <TableRow
                         key={index}
                         style={{ textDecoration: "none", color: "inherit" }}
                       >
-                        {/* <TableCell align="center">{doctor.id}</TableCell> */}
                         <TableCell align="right">
                           <Avatar
                             src={"https://i.pravatar.cc/300"}
-                            sx={{
-                              height: "25%"
-                            }}
+                            sx={{ height: "25%" }}
                           />
                         </TableCell>
                         <TableCell>{doctor.fullName}</TableCell>
@@ -81,7 +108,12 @@ export default function DoctorList() {
                         <TableCell>{doctor.phone}</TableCell>
                         <TableCell>{doctor.education}</TableCell>
                       </TableRow>
-                    ))}
+                    ))
+                  ) : (
+                    <TableRow>
+                      <TableCell colSpan={6} align="center">No doctors available.</TableCell>
+                    </TableRow>
+                  )}
                 </TableBody>
               </Table>
             </TableContainer>

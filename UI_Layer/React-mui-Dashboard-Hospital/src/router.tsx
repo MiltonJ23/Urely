@@ -41,15 +41,15 @@ const AdminElement = ({ children }: any) => {
 };
 
 const ProtectedRoute = ({ children }: any) => {
-  if (
-    CURRENT_USER_TYPE === USER_TYPES.ADMIN_USER ||
-    CURRENT_USER_TYPE === USER_TYPES.NORMAL_USER
-  ) {
-    return <>{children}</>;
-  } else {
-    return <Navigate to="/" />;
+  const authToken = sessionStorage.getItem("authToken");
+
+  if (!authToken) {
+    return <Navigate to="/login" replace />;
   }
+
+  return children;
 };
+
 
 export const router = createBrowserRouter([
   {

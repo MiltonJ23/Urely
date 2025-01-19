@@ -143,23 +143,20 @@
 // }
 
 // src/pages/Dashboard.tsx
-import * as React from "react";
-import Box from "@mui/material/Box";
-import Toolbar from "@mui/material/Toolbar";
-import Container from "@mui/material/Container";
-import Grid from "@mui/material/Grid";
-import Paper from "@mui/material/Paper";
-import PieChart from "./PieChart";
-import BarChart from "./BarChart";
-import HealthCard from "./HealthCard";
-import LatestAppointments from "./LatestAppointments";
-import ActivityLog from "./ActivityLog";
-import Appbar from "../../components/Appbar";
 
-import PeopleIcon from "@mui/icons-material/People";
-import TodayIcon from "@mui/icons-material/Today";
-import VolunteerActivismIcon from "@mui/icons-material/VolunteerActivism";
-import CurrencyRupeeIcon from "@mui/icons-material/CurrencyRupee";
+import React from "react";
+import { Box, Container, Grid, Paper, Toolbar } from "@mui/material";
+import StepsIcon from "@mui/icons-material/DirectionsWalk";
+import CalorieIcon from "@mui/icons-material/LocalFireDepartment";
+import HealthTipsIcon from "@mui/icons-material/HealthAndSafety";
+import EarningsIcon from "@mui/icons-material/AttachMoney";
+import Appbar from "../../components/Appbar";
+import HealthCard from "./HealthCard";
+import StepsChart from "./StepsChart";
+import CaloriesChart from "./CaloriesChart";
+import UpcomingAppointments from "./UpcomingAppoinments";
+import WellnessActivities from "./WellnessActivities";
+import HealthMetricsIcon from "@mui/icons-material/FitnessCenter";
 
 interface CardData {
   icon: React.ReactNode;
@@ -167,35 +164,39 @@ interface CardData {
   value: string | number;
 }
 
+
 const cardData: CardData[] = [
   {
-    icon: <PeopleIcon />,
-    title: "Health Insights",
-    value: "Personalized insights based on your activity",
+    icon: <StepsIcon />,
+    title: "Steps Today",
+    value: 7500,
   },
   {
-    icon: <TodayIcon />,
-    title: "Appointments",
-    value: 1,
+    icon: <CalorieIcon />,
+    title: "Calories Burned",
+    value: 350,
   },
   {
-    icon: <VolunteerActivismIcon />,
-    title: "Wellness Alerts",
-    value: "Stay informed on common regional conditions",
+    icon: <HealthTipsIcon />,
+    title: "Health Tips",
+    value: "Drink more water today!",
   },
   {
-    icon: <CurrencyRupeeIcon />,
-    title: "Income",
-    value: "FCF400000",
+    icon: <HealthMetricsIcon />,
+    title: "Personalized insights",
+    value: "Monitor your key health metrics",
   },
 ];
 
-const chartData = [{ chartName: <PieChart /> }, { chartName: <BarChart /> }];
+const chartData = [
+  { ChartComponent: <StepsChart /> },
+  { ChartComponent: <CaloriesChart /> },
+];
 
 const UserDashboard: React.FC = () => {
   return (
     <Box sx={{ display: "flex" }}>
-      <Appbar appBarTitle="Health & Wellness Dashboard" />
+      <Appbar appBarTitle="Health Dashboard" />
 
       <Box
         component="main"
@@ -213,6 +214,7 @@ const UserDashboard: React.FC = () => {
 
         <Container sx={{ mt: 4, mb: 4 }}>
           <Grid container spacing={3}>
+            {/* Cards */}
             {cardData.map((item, index) => (
               <Grid key={index} item xs={12} md={4} lg={3}>
                 <Paper
@@ -232,6 +234,7 @@ const UserDashboard: React.FC = () => {
               </Grid>
             ))}
 
+            {/* Charts */}
             {chartData.map((item, index) => (
               <Grid key={index} item xs={12} md={6} lg={6}>
                 <Paper
@@ -242,20 +245,22 @@ const UserDashboard: React.FC = () => {
                     height: 400,
                   }}
                 >
-                  {item.chartName}
+                  {item.ChartComponent}
                 </Paper>
               </Grid>
             ))}
 
+            {/* Upcoming Appointments */}
             <Grid item xs={12}>
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                <LatestAppointments />
+                <UpcomingAppointments />
               </Paper>
             </Grid>
 
+            {/* Wellness Activities */}
             <Grid item xs={12}>
               <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                <ActivityLog />
+                <WellnessActivities />
               </Paper>
             </Grid>
           </Grid>

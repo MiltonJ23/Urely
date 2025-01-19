@@ -43,51 +43,17 @@ class HealthLogs(models.Model):
     def __str__(self):
         return f"{self.user.first_name} {self.user.last_name} - {self.activity_type}"
 
-#Clinics model
-class Clinic(models.Model):
-    name = models.CharField(max_length=200)
-    address = models.TextField()
-    phone_number = models.CharField(max_length=15)
-    email = models.EmailField(unique=True)
-    opening_hours = models.CharField(max_length=100)
-    closing_hours = models.CharField(max_length=100)
-
-# Appointments Model
-class Appointments(models.Model):
-    user = models.ForeignKey(UserAccount, on_delete=models.CASCADE)
-    clinic = models.ForeignKey(Clinic, on_delete=models.CASCADE)
-    email_address = models.EmailField()
-    date = models.DateTimeField()
-    status = models.CharField(max_length=50)
-
-    def __str__(self):
-        return f"{self.user.name} - {self.clinic.name} on {self.date}"
 
 
 
 class Profile(models.Model):
     user = models.OneToOneField(UserAccount, on_delete=models.CASCADE, null=True)
-    age = models.IntegerField(null=True, blank=True)  # Allows optional input
+    age = models.IntegerField(null=True, blank=True) 
     date_of_birth = models.DateField(null=True, blank=True)
+    profile_picture = models.ImageField(upload_to="profile_pics/", blank=True, null=True, default="profile_pics/default.png")
     gender = models.CharField(max_length=6, null=True, blank=True)
-    email = models.EmailField(unique=True, null=True, blank=True)
     phone_number = models.CharField(max_length=15, null=True, blank=True)
     address = models.TextField(null=True, blank=True)
     city = models.CharField(max_length=50, null=True, blank=True)
+    country = models.CharField(max_length=50, null=True, blank=True)
 
-
-class Appointment(models.Model):
-    patient = models.ForeignKey(Profile, null=True,on_delete=models.SET_NULL)
-    clinic = models.ForeignKey(Clinic, null=True,on_delete=models.SET_NULL)
-    date = models.DateField()
-    time = models.TimeField()
-    reason = models.TextField(max_length=255)
-    status = models.CharField(
-        max_length=20,
-        choices=[
-            ("Scheduled", "Scheduled"),
-            ("Completed", "Completed"),
-            ("Cancelled", "Cancelled"),
-        ],
-        default="Scheduled",
-    )

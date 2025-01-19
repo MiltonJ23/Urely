@@ -9,10 +9,10 @@ from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
 from .serializers import *
-from django.http import HttpResponse, JsonResponse
+from django.http import JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
-from user.models import Profile, Clinic, Appointment
+from user.models import Profile
 from django.contrib.auth.tokens import default_token_generator
 from django.utils.http import urlsafe_base64_encode
 from django.utils.encoding import force_bytes
@@ -37,7 +37,7 @@ class UserDetailView(RetrieveAPIView):
         return self.request.user
 
 class LogoutView(APIView):
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def post(self, request, *args, **kwargs):
         try:
@@ -114,52 +114,11 @@ def get_user_details(request):
     user_data = UserSerializer(user)
     
     return Response(user_data.data)
+
+        
     
-@csrf_exempt
-def clinic_list(request):
-    """
-    List all code snippets, or create a new snippet.
-    """
-    if request.method == 'GET':
-        snippets = Clinic.objects.all()
-        serializer = ClinicSerializer(snippets, many=True)
-        return JsonResponse(serializer.data, safe=False)
-
-    def post(request):
-        serializer = ClinicSerializer(data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_201_CREATED)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-        
-class HealthList(APIView):        
-        def get(request):
-            health = HealthLog.objects.all()
-            serializer = HealthSerializer(health, many=True)
-            return Response(serializer.data, safe=False)
-
-        def post(request):
-            serializer = HealthSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=201)
-            return Response(serializer.errors, status=400)
-        
-class AppointmentList(APIView):        
-        def get(request):
-            snippets = Appointment.objects.all()
-            serializer = AppointmentSerializer(snippets, many=True)
-            return Response(serializer.data, safe=False)
-
-        def post(request):
-            serializer = AppointmentSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=201)
-            return Response(serializer.errors, status=400)
         
 class ProfileDetail(APIView):
-
     def get_object(self, id):
         try:
             return Profile.objects.get(id=id)
@@ -184,84 +143,19 @@ class ProfileDetail(APIView):
         profile.delete()
         return Response(status=status.HTTP_204_NO_CONTENT)
     
-class ClinicDetail(APIView):
-    def get_object(self, id):
-        try:
-            return Clinic.objects.get(id=id)
-        except Clinic.DoesNotExist:
-            raise Response(status=status.HTTP_404_NOT_FOUND)
-
-    def get(self, request, id):
-        clinic = self.get_object(id)
-        serializer = ClinicSerializer(clinic)
-        return Response(serializer.data)
-
-    def put(self, request, id):
-        clinic = self.get_object(id) 
-        serializer = ClinicSerializer(clinic, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, id):
-        clinic = self.get_object(id)
-        clinic.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
     
-class HealthDetail(APIView):
-    def get_object(self, id):
-        try:
-            return HealthLog.objects.get(id=id)
-        except HealthLog.DoesNotExist:
-            raise Response(status=status.HTTP_404_NOT_FOUND)
-
-    def get(self, request, id):
-        health = self.get_object(id)
-        serializer = HealthSerializer(health)
-        return Response(serializer.data)
-
-    def put(self, request, id):
-        health = self.get_object(id)
-        serializer = HealthSerializer(health, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-
-    def delete(self, request, id):
-        health = self.get_object(id)
-        health.delete()
-        return Response(status=status.HTTP_204_NO_CONTENT)
     
-class AppointmentDetail(APIView):
-    def get_object(self, id):
-        try:
-            return Appointment.objects.get(id=id)
-        except Appointment.DoesNotExist:
-            raise Response(status=status.HTTP_404_NOT_FOUND)
 
-    def get(self, request, id):
-        appointment = self.get_object(id)
-        serializer = AppointmentSerializer(appointment)
-        return Response(serializer.data)
+class UserDashboardView(APIView):
+    permission_classes = [IsAuthenticated]
 
-    def put(self, request, id):
-        appointment = self.get_object(id)
-        serializer = AppointmentSerializer(appointment, data=request.data)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data)
-        return Response(serializer.errors, status=400)
-
-    def delete(self, request, id):
-        appointment = self.get_object(id)
-        appointment.delete()
-        return Response(status=204)
+    def get(self, request):
+        # Your logic here
+        return Response({"message": "Welcome to the dashboard"})
     
+
 
 @api_view(['POST'])
-# Use AllowAny to allow unauthenticated access to this view
 @permission_classes([AllowAny])
 def forgot_password(request):
     email = request.data.get('email')
