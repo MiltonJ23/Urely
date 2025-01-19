@@ -19,6 +19,10 @@ urlpatterns = [
     path('logout/', LogoutView.as_view(), name='logout'),
     path('profile/', ProfileView.as_view(), name='profile'),
     path('token/', TokenObtainPairView.as_view(), name='token-obtain'),
+    
+    path('forgot-password/', views.forgot_password, name='forgot-password'),
+
+    path('get-user/', views.get_user_details, name='get-user'),
 
     path('token/verify/', VerifyTokenView.as_view(), name='verify-token'),
 ]

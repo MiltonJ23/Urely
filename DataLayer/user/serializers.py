@@ -1,4 +1,4 @@
-from .models import Appointment, Clinic, HealthLog, UserAccount
+from .models import Appointment, Clinic, UserAccount
 from rest_framework import serializers
 from rest_framework.fields import CharField, EmailField
 
@@ -38,10 +38,6 @@ class ClinicSerializer(serializers.ModelSerializer):
         model = Clinic
         fields = ['id', 'name', 'address', 'phone_number', 'email', 'opening_hours', 'closing_hours']
 
-class HealthSerializer(serializers.ModelSerializer):
-    class Meta:
-        model = HealthLog
-        fields = ['id', 'patient']
 
 class AppointmentSerializer(serializers.ModelSerializer):
     class Meta:

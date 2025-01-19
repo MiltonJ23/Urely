@@ -1,5 +1,7 @@
+from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
 from rest_framework.generics import RetrieveAPIView
+from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
 from rest_framework.response import Response
 from rest_framework import status
@@ -10,7 +12,11 @@ from .serializers import *
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
-from user.models import Profile,Clinic,HealthLog,Appointment
+from user.models import Profile, Clinic, Appointment
+from django.contrib.auth.tokens import default_token_generator
+from django.utils.http import urlsafe_base64_encode
+from django.utils.encoding import force_bytes
+from django.core.mail import send_mail
 
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]
@@ -97,6 +103,18 @@ def profile_list(request):
             return JsonResponse(serializer.data, status=201)
         return JsonResponse(serializer.errors, status=400)
     
+
+@api_view(['GET'])
+@permission_classes([IsAuthenticated])
+def get_user_details(request):
+    # The user is automatically fetched from the token
+    user = request.user
+
+    # Serialize the user object to return relevant details
+    user_data = UserSerializer(user)
+    
+    return Response(user_data.data)
+    
 @csrf_exempt
 def clinic_list(request):
     """
@@ -107,12 +125,12 @@ def clinic_list(request):
         serializer = ClinicSerializer(snippets, many=True)
         return JsonResponse(serializer.data, safe=False)
 
-        def post(request):
-            serializer = ClinicSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=status.HTTP_201_CREATED)
-            return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+    def post(request):
+        serializer = ClinicSerializer(data=request.data)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=status.HTTP_201_CREATED)
+        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
         
 class HealthList(APIView):        
         def get(request):
@@ -240,3 +258,34 @@ class AppointmentDetail(APIView):
         appointment = self.get_object(id)
         appointment.delete()
         return Response(status=204)
+    
+
+@api_view(['POST'])
+# Use AllowAny to allow unauthenticated access to this view
+@permission_classes([AllowAny])
+def forgot_password(request):
+    email = request.data.get('email')
+
+    if not email:
+        return Response({"error": "Email is required"}, status=status.HTTP_400_BAD_REQUEST)
+
+    try:
+        user = UserAccount.objects.get(email=email)
+    except UserAccount.DoesNotExist:
+        return Response({"error": "No user found with that email address"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Generate password reset token
+    token = default_token_generator.make_token(user)
+    uid = urlsafe_base64_encode(force_bytes(user.pk))
+
+    # Send password reset email
+    reset_link = f"http://localhost:3000/reset-password/{uid}/{token}/"
+    send_mail(
+        'Password Reset Request',
+        f'Click the link to reset your password: {reset_link}',
+        settings.EMAIL_HOST_USER,  # Replace with your sender email
+        [email],
+        fail_silently=False,
+    )
+
+    return Response({"message": "Password reset link sent to your email."}, status=status.HTTP_200_OK)

@@ -66,15 +66,14 @@ class Appointments(models.Model):
 
 
 class Profile(models.Model):
-    name = models.CharField(max_length=100)
-    date_of_birth = models.DateField()
-    email = models.EmailField(unique=True)
-    phone_number = models.CharField(max_length=15)
-    address = models.TextField()
-
-
-class HealthLog(models.Model):
-    patient = models.ForeignKey(Profile, null=True,on_delete=models.SET_NULL)
+    user = models.OneToOneField(UserAccount, on_delete=models.CASCADE, null=True)
+    age = models.IntegerField(null=True, blank=True)  # Allows optional input
+    date_of_birth = models.DateField(null=True, blank=True)
+    gender = models.CharField(max_length=6, null=True, blank=True)
+    email = models.EmailField(unique=True, null=True, blank=True)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+    city = models.CharField(max_length=50, null=True, blank=True)
 
 
 class Appointment(models.Model):

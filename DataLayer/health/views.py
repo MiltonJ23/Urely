@@ -47,7 +47,7 @@ class ActivityLogViewSet(viewsets.ModelViewSet):
     """
     queryset = ActivityLog.objects.all()
     serializer_class = ActivityLogSerializer
-    permission_classes = [AllowAny]
+    permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
         # Filter logs to only those belonging to the authenticated user

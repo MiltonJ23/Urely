@@ -19,6 +19,8 @@ import InputLabel from "@mui/material/InputLabel";
 import MenuItem from "@mui/material/MenuItem";
 import FormControl from "@mui/material/FormControl";
 import Select from "@mui/material/Select";
+import axios from "axios"; // Import axios for making API requests
+import { getUserDetails } from "../../store/user";
 
 type FormValues = {
   id: string;
@@ -45,12 +47,44 @@ export default function AppointmentDialog({
   setAppointments,
 }: any) {
   const [open, setOpen] = React.useState(false);
+  const [userData, setUserData] = React.useState<any>(null); // State to store the fetched user data
 
   const {
     register,
     handleSubmit,
+    setValue, // useForm method to set field values
     formState: { errors },
   } = useForm<FormValues>();
+
+
+  // Fetch the user data (e.g., full name) when the component is mounted
+  React.useEffect(() => {
+    const fetchUserData = async () => {
+      const token = localStorage.getItem("authToken");
+      try {
+        // Assuming you have an API endpoint that returns user data
+        const response = await fetch("http://localhost:8000/api/auth/get-user/", {
+          method: "GET",
+          headers: {
+            "Authorization": `Bearer ${token}`,
+          },
+        });
+        const user = await response.json();
+
+        // Set the fetched data into the form fields
+        setUserData(user);
+        console.log(user);
+        setValue("fullName", user.first_name + user.last_name); // Prepopulate full name
+        console.log(user.first_name + user.last_name);
+        
+        setValue("gender", user.profile.gender); // Optionally set other fields
+      } catch (error) {
+        console.error("Error fetching user data:", error);
+      }
+    };
+
+    fetchUserData();
+  }, [setValue]); // Re-run only when the component mounts
 
   const handleClickOpen = () => {
     setOpen(true);
@@ -60,10 +94,23 @@ export default function AppointmentDialog({
     setOpen(false);
   };
 
-  const onSubmit = (data: FormValues) => {
+  const onSubmit = async (data: FormValues) => {
+    // Set the ID manually if needed
     data.id = appointments.length + 1;
-    setAppointments((prevState: any) => [...prevState, data]);
-    handleClose();
+
+    try {
+      // Send the data to the backend
+      await axios.post("http://your-api-endpoint/api/appointments", data);
+
+      // Update the state if the POST request is successful
+      setAppointments((prevState: any) => [...prevState, data]);
+
+      // Close the dialog
+      handleClose();
+    } catch (error) {
+      console.error("Error adding appointment:", error);
+      // Handle the error, maybe show a notification or alert
+    }
   };
 
   return (
@@ -103,6 +150,7 @@ export default function AppointmentDialog({
               type="fullName"
               fullWidth
               variant="outlined"
+              defaultValue={userData?.fullName} // Prepopulate with fetched data
               {...register("fullName", {
                 required: "Name is required",
               })}

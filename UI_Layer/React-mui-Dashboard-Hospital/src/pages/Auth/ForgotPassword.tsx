@@ -9,6 +9,7 @@ import LockOutlinedIcon from "@mui/icons-material/LockOutlined";
 import Typography from "@mui/material/Typography";
 import Container from "@mui/material/Container";
 import { useForm } from "react-hook-form";
+import axios from "axios";
 
 type FormValues = {
   email: string;
@@ -21,7 +22,18 @@ export default function ForgotPassword() {
     formState: { errors }
   } = useForm<FormValues>();
 
-  const onSubmit = (data: FormValues) => console.log(data);
+  const onSubmit = async (data: FormValues) => {
+    try {
+      const response = await axios.post("http://localhost:8000/api/auth/forgot-password/", {
+        email: data.email,
+      });
+      console.log("Password reset link sent:", response.data);
+      alert("Password reset link sent to your email.");
+    } catch (error) {
+      console.error("Error sending password reset link:", error);
+      alert("Failed to send reset link. Please try again.");
+    }
+  };  
 
   return (
     <Container component="main" maxWidth="xs" sx={{ height: "80vh" }}>
@@ -46,13 +58,9 @@ export default function ForgotPassword() {
           <form onSubmit={handleSubmit(onSubmit)}>
             <Grid item>
               <TextField
-                //autoComplete="email"
-                //name="email"
-                //required
                 fullWidth
                 id="email"
                 label="Email Address"
-                //autoFocus
                 {...register("email", {
                   required: "Email is required"
                 })}
@@ -72,13 +80,7 @@ export default function ForgotPassword() {
           </form>
           <Grid container justifyContent="center">
             <Grid item>
-              <Link
-                to={"/login"}
-                style={{
-                  //textDecoration: "none",
-                  color: "inherit"
-                }}
-              >
+              <Link to={"/login"} style={{ color: "inherit" }}>
                 Back to Login
               </Link>
             </Grid>

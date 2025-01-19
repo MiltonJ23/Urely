@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Grid, Box } from "@mui/material";
 import Toolbar from "@mui/material/Toolbar";
 import Container from "@mui/material/Container";
@@ -6,10 +6,41 @@ import Appbar from "../../components/Appbar";
 import AppointmentDialog from "./AppointmentDialog";
 import { appointmentsData } from "../../mockData";
 import AppointmentTableData from "./AppointmentTableData";
+import axios from "axios";
 
 function Appointments() {
-  const [appointments, setAppointments] = React.useState(appointmentsData);
+  const [appointments, setAppointments] = useState([]);
 
+  const fetchAppointments = async () => {
+    const token = localStorage.getItem("authToken");
+  
+    if (!token) {
+      console.error("No token found");
+      return;
+    }
+  
+    try {
+      console.log("Fetching appointments...");
+      const response = await axios.get("http://localhost:8000/api/appointments/", {
+        headers: {
+          Authorization: `Bearer ${token}`,
+        },
+      });
+      console.log(response.data);
+      setAppointments(response.data);
+    } catch (error) {
+      console.error("Failed to fetch appointments:", error);
+    }
+  };
+  
+  useEffect(() => {
+    console.log("useEffect triggered");
+    const fetchData = async () => {
+      await fetchAppointments();
+    };
+    fetchData();
+  }, []); // Empty dependency array ensures this only runs once
+  
   return (
     <Box sx={{ display: "flex" }}>
       <Appbar appBarTitle="Appointment" />

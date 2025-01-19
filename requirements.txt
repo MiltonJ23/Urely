@@ -10,3 +10,4 @@ speechrecognition
 python-dotenv
 django-extensions
 SQLAlchemy
+python-dotenv

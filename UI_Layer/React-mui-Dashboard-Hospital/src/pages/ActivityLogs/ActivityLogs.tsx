@@ -27,22 +27,50 @@ const ActivityLogs = () => {
   useEffect(() => {
     const fetchLogs = async () => {
       try {
-        const token = localStorage.getItem("authToken"); // Assuming the token is stored in localStorage
-        const response = await axios.get("http://localhost:8000/api/health/activity-logs/", {
-          headers: {
-            Authorization: `Bearer ${token}`,
-          },
-        });
-        setLogs(response.data);
+        const token = localStorage.getItem("authToken");
+        if (!token) {
+          throw new Error("No authentication token found.");
+        }
+
+        const response = await axios.get(
+          "http://localhost:8000/api/health/activity-logs/",
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        // Use API response or default to an empty log structure
+        setLogs(
+          response.data.length > 0
+            ? response.data
+            : [
+                {
+                  water_intake: 0,
+                  exercise_duration: 0,
+                  medication_count: 0,
+                  food_intake: 0,
+                },
+              ]
+        );
       } catch (error) {
         console.error("Error fetching activity logs", error);
+        setLogs([
+          {
+            water_intake: 0,
+            exercise_duration: 0,
+            medication_count: 0,
+            food_intake: 0,
+          },
+        ]); // Default to 0 values if an error occurs
       } finally {
         setLoading(false);
       }
     };
+
     fetchLogs();
   }, []);
-  
 
   if (loading) return <div>Loading...</div>;
 
@@ -62,15 +90,20 @@ const ActivityLogs = () => {
         }}
       >
         <Container sx={{ mt: 4, mb: 4 }}>
-          <Grid container spacing={3}>
+          <Grid container spacing={4} direction="column">
+            {" "}
+            {/* Force vertical stacking */}
             {logs.map((log, index) => (
-              <Grid key={index} item xs={12} md={6} lg={4}>
+              <Grid key={index} item xs={12} md={12} lg={12}>
+                {" "}
+                {/* Full width */}
                 <Paper
                   sx={{
                     p: 2,
                     display: "flex",
                     flexDirection: "column",
-                    height: 280,
+                    gap: 2,
+                    height: "auto",
                     justifyContent: "space-between",
                   }}
                 >
