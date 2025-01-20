@@ -1,11 +1,15 @@
-from django.urls import path
+from django.db import router
+from django.urls import include, path
+from rest_framework.routers import DefaultRouter
 from . import views
+
+router = DefaultRouter()
+router.register(r'appointments', views.AppointmentViewSet)
 
 urlpatterns = [
     path('', views.appointments_list, name='index'),
     path('recent/', views.RecentAppointmentsView.as_view(), name='recent-appointments'),
-    path('<int:appointment_id>/', views.get_appointment_details, name='appointment-detail'),
-    path('create/', views.create_appointment, name='appointment-create'),
+    path('api/', include(router.urls)),
     path('update/<int:appointment_id>/', views.CompleteAppointmentView.as_view(), name='appointment-update'),
     # path('update/<int:appointment_id>/', views, name='appointment-update'),
     path('delete/<int:appointment_id>/', views.cancel_appointment, name='appointment-delete'),

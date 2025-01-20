@@ -1,11 +1,12 @@
 from datetime import date
 from django.http import JsonResponse
-from requests import Response
+from rest_framework.response import Response
 from rest_framework import generics, viewsets
-from rest_framework.permissions import IsAuthenticated, IsAdminUser, AllowAny
+from rest_framework.permissions import IsAuthenticated, AllowAny
+from rest_framework.views import APIView
 from rest_framework.decorators import action
 from django.db.models import Sum
-from .models import WaterIntake, PhysicalActivity, ActivityLog
+from .models import WaterIntake, PhysicalActivity, ActivityLog, HealthTip
 from .serializers import ActivityLogSerializer, WaterIntakeSerializer, PhysicalActivitySerializer
 
 class WaterIntakeListCreateView(generics.ListCreateAPIView):
@@ -45,16 +46,25 @@ class ActivityLogViewSet(viewsets.ModelViewSet):
     """
     ViewSet for managing Activity Logs.
     """
-    queryset = ActivityLog.objects.all()
     serializer_class = ActivityLogSerializer
     permission_classes = [IsAuthenticated]
 
     def get_queryset(self):
-        # Filter logs to only those belonging to the authenticated user
-        return self.queryset.filter(user=self.request.user)
+        """
+        Filter logs to only those belonging to the authenticated user.
+        """
+        return ActivityLog.objects.filter(user=self.request.user)
 
     def perform_create(self, serializer):
-        # Automatically set the user to the authenticated user
+        """
+        Automatically set the user to the authenticated user before saving.
+        """
+        serializer.save(user=self.request.user)
+
+    def perform_update(self, serializer):
+        """
+        Automatically update the user to the authenticated user before saving.
+        """
         serializer.save(user=self.request.user)
 
     @action(detail=False, methods=["get"])
@@ -67,3 +77,48 @@ class ActivityLogViewSet(viewsets.ModelViewSet):
             return Response({"detail": "No activity log for today"}, status=404)
         serializer = self.get_serializer(log)
         return Response(serializer.data)
+
+
+
+class DashboardDataView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        user = request.user
+
+        # Fetch activity log for today (handling case where no data is found)
+        today = date.today()
+        activity_log = ActivityLog.objects.filter(user=user, date=today)
+
+
+        # Aggregate steps and calories burned
+        total_steps = activity_log.aggregate(Sum('steps_count'))['steps_count__sum'] or 0
+        total_calories = activity_log.aggregate(Sum('calories_burned'))['calories_burned__sum'] or 0
+
+        # Fetch a random health tip, or default if none found
+        health_tip = HealthTip.objects.all().order_by('?').first()
+        health_tip_text = health_tip.tip if health_tip else "Drink more water today!"
+
+        # Fetch user insights from UserAccount, if available
+        user_insight = user.insight if user else "Monitor your key health metrics"
+
+        # Card data - Dynamically set values
+        card_data = [
+            {"title": "Steps Today", "value": total_steps},
+            {"title": "Calories Burned", "value": total_calories},
+            {"title": "Health Tips", "value": health_tip_text},
+            {"title": "Personalized Insights", "value": user_insight},
+        ]
+
+        # Chart data - You can replace these with actual chart components or dynamic data
+        chart_data = [
+            {"name": "Steps", "steps": total_steps, "calories": total_calories},  # Steps data
+            {"name": "Calories", "steps": 0, "calories": total_calories},  # Calories data
+        ]
+
+
+        # Corrected: Return response with card and chart data using keyword arguments
+        return JsonResponse({
+            "cardData": card_data if card_data else [],  # Empty list if no card data found
+            "chartData": chart_data if chart_data else []  # Empty list if no chart data found
+        })

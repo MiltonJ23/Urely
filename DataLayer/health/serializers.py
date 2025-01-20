@@ -28,6 +28,8 @@ class ActivityLogSerializer(serializers.ModelSerializer):
     is_exercise_met = serializers.ReadOnlyField()
     is_medication_met = serializers.ReadOnlyField()
     is_food_intake_met = serializers.ReadOnlyField()
+    is_steps_met = serializers.ReadOnlyField()
+    is_calories_met = serializers.ReadOnlyField()
 
     class Meta:
         model = ActivityLog
@@ -43,5 +45,7 @@ class ActivityLogSerializer(serializers.ModelSerializer):
             "is_exercise_met",
             "is_medication_met",
             "is_food_intake_met",
+            "is_steps_met",
+            "is_calories_met",
         ]
-        read_only_fields = ["id", "is_water_intake_met", "is_exercise_met", "is_medication_met", "is_food_intake_met"]
+        read_only_fields = ["id", "is_water_intake_met", "is_exercise_met", "is_medication_met", "is_food_intake_met", 'is_steps_met', 'is_calories_met']

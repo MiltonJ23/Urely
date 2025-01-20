@@ -9,6 +9,7 @@ class UserManager(BaseUserManager):
         user = self.model(email=email, **extra_fields)
         user.set_password(password)
         user.save(using=self._db)
+        Profile.objects.create(user=user)
         return user
 
     def create_superuser(self, email, password=None, **extra_fields):
@@ -21,6 +22,7 @@ class UserAccount(AbstractBaseUser, PermissionsMixin):
     first_name = models.CharField(max_length=50, blank=True)
     last_name = models.CharField(max_length=50, blank=True)
     is_active = models.BooleanField(default=True)
+    insight = models.TextField(default="Monitor your key health metrics", blank=True)
     is_staff = models.BooleanField(default=False)
     date_joined = models.DateTimeField(auto_now_add=True)
     preferred_language = models.CharField(max_length=50, default='English')
@@ -56,4 +58,5 @@ class Profile(models.Model):
     address = models.TextField(null=True, blank=True)
     city = models.CharField(max_length=50, null=True, blank=True)
     country = models.CharField(max_length=50, null=True, blank=True)
+    public_contact = models.BooleanField(default=False)
 

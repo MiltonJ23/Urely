@@ -1,4 +1,4 @@
-import * as React from "react";
+import { useState, useEffect} from "react";
 import { createBrowserRouter, Navigate } from "react-router-dom";
 import ErrorPage from "./components/ErrorPage";
 import SignUp from "./pages/Auth/SignUp";
@@ -24,6 +24,7 @@ import CarePlan from "./pages/Care_Plan/Careplan";
 import Help from "./pages/Help/Help";
 import UserDashboard from "./pages/user-dashboard/user-dashboard";
 import ActivityLogs from "./pages/ActivityLogs/ActivityLogs";
+import { CircularProgress } from "@mui/material";
 
 const USER_TYPES = {
   NORMAL_USER: "Normal User",
@@ -41,9 +42,46 @@ const AdminElement = ({ children }: any) => {
 };
 
 const ProtectedRoute = ({ children }: any) => {
+  const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null indicates loading state
   const authToken = sessionStorage.getItem("authToken");
 
-  if (!authToken) {
+  useEffect(() => {
+    const verifyToken = async () => {
+      if (!authToken) {
+        setIsAuthenticated(false);
+        return;
+      }
+
+      try {
+        const response = await fetch("http://localhost:8000/api/auth/token/verify/", {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+
+        if (response.ok) {
+          setIsAuthenticated(true);
+        } else {
+          setIsAuthenticated(false);
+        }
+      } catch (error) {
+        console.error("Error verifying token:", error);
+        setIsAuthenticated(false);
+      }
+    };
+
+    verifyToken();
+  }, [authToken]);
+
+  if (isAuthenticated === null) {
+    // Show a loading indicator while checking authentication
+    return <CircularProgress />;
+  }
+
+  if (!isAuthenticated) {
+    sessionStorage.clear()
     return <Navigate to="/login" replace />;
   }
 

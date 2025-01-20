@@ -100,7 +100,7 @@ export default function Appbar(props: { appBarTitle: string }) {
               aria-label="show 17 new notifications"
               color="inherit"
             >
-              <Badge badgeContent={17} color="secondary">
+              <Badge badgeContent={0} color="secondary">
                 <NotificationsIcon />
               </Badge>
             </IconButton>
@@ -128,7 +128,7 @@ export default function Appbar(props: { appBarTitle: string }) {
                 vertical: "top",
                 horizontal: "right",
               }}
-              keepMounted
+              // keepMounted
               transformOrigin={{
                 vertical: "top",
                 horizontal: "right",
@@ -140,7 +140,23 @@ export default function Appbar(props: { appBarTitle: string }) {
                 <MenuItem key={index} onClick={handleCloseUserMenu}>
                   <Link
                     to={setting.url}
-                    style={{ textDecoration: "none", color: "inherit" }}
+                    style={{
+                      textDecoration: "none", // Remove underline
+                      color: "inherit", // Inherit the text color from the parent
+                      background: setting.color, // Background color from setting
+                      padding: "8px 16px", // Add padding for better spacing
+                      borderRadius: "4px", // Add rounded corners
+                      display: "block", // Ensure it takes full width for easier click/tap
+                      transition: "background-color 0.3s ease", // Smooth transition for background color
+                    }}
+                    onMouseEnter={(e) => {
+                      // Hover effect: slightly darken background color
+                      (e.target as HTMLElement).style.backgroundColor = "#ddd";
+                    }}
+                    onMouseLeave={(e) => {
+                      // Reset background color when hover ends
+                      (e.target as HTMLElement).style.backgroundColor = setting.color || "";
+                    }}
                   >
                     <Typography textAlign="center">{setting.text}</Typography>
                   </Link>

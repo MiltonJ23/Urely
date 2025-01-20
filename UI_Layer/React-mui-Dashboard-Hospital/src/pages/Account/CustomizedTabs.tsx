@@ -70,9 +70,9 @@ export default function CustomizedTabs() {
           <StyledTabs onChange={handleChange} aria-label="lab API tabs example" value={value} >
             <StyledTab label="General" value="1" />
             <StyledTab label="Billing" value="2" />
-            <StyledTab label="Team" value="3" />
-            <StyledTab label="Notification" value="4" />
-            <StyledTab label="Security" value="5" />
+            {/* <StyledTab label="Team" value="3" /> */}
+            <StyledTab label="Notification" value="3" />
+            {/* <StyledTab label="Security" value="5" /> */}
           </StyledTabs>
         </Box>
         <TabPanel sx={{ width: "100%" }} value="1">

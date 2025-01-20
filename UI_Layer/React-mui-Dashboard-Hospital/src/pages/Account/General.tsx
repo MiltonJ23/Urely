@@ -1,28 +1,147 @@
-import * as React from "react";
-import Grid from "@mui/material/Grid";
-import IconButton from "@mui/material/IconButton";
-import TextField from "@mui/material/TextField";
-import Button from "@mui/material/Button";
-import { Avatar, Typography, Stack } from "@mui/material";
-import Divider from "@mui/material/Divider";
-import Switch from "@mui/material/Switch";
+import { useState, useEffect } from "react";
+import {
+  Grid,
+  IconButton,
+  TextField,
+  Button,
+  Avatar,
+  Typography,
+  Stack,
+  Divider,
+  Switch,
+  CircularProgress,
+  Alert,
+  Snackbar,
+  Select,
+  MenuItem,
+} from "@mui/material";
+import { useNavigate } from "react-router-dom";
 
 export default function General() {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [email, setEmail] = useState("");
+  const [contactPublic, setContactPublic] = useState(true);
+  const [availableToHire, setAvailableToHire] = useState(true);
+  const [selectedLanguage, setSelectedLanguage] = useState("English");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+  const [openSnackbar, setOpenSnackbar] = useState(false);
+
+  const domain_name = process.env.REACT_APP_API_URL || "http://localhost:8000";
+  const authToken = sessionStorage.getItem("authToken");
+  const navigate = useNavigate();
+
+  useEffect(() => {
+    const fetchUserData = async () => {
+      setLoading(true);
+      try {
+        const response = await fetch(`${domain_name}/api/auth/profile/`, {
+          headers: {
+            Authorization: `Bearer ${authToken}`,
+          },
+        });
+        if (!response.ok) throw new Error("Failed to fetch user data.");
+        const data = await response.json();
+        setFirstName(data.first_name || "");
+        setLastName(data.last_name || "");
+        setEmail(data.email || "");
+        setContactPublic(data.contact_public || false);
+        setAvailableToHire(data.available_to_hire || false);
+        setSelectedLanguage(data.preferred_language || "English");
+      } catch (error) {
+        setError(error instanceof Error ? error.message : "An error occurred.");
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchUserData();
+  }, [authToken]);
+
+  const handleSaveFullName = async () => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${domain_name}/api/auth/profile/update`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({ first_name: firstName, last_name: lastName }),
+      });
+      if (!response.ok) throw new Error("Failed to update name.");
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleToggleSwitch = async (
+    setting: string,
+    value: boolean | string
+  ) => {
+    setLoading(true);
+    setError(null);
+    try {
+      const response = await fetch(`${domain_name}/api/auth/settings/`, {
+        method: "PATCH",
+        headers: {
+          "Content-Type": "application/json",
+          Authorization: `Bearer ${authToken}`,
+        },
+        body: JSON.stringify({ [setting]: value }),
+      });
+      if (!response.ok) throw new Error(`Failed to update ${setting}.`);
+    } catch (error) {
+      setError(error instanceof Error ? error.message : "An error occurred.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const handleDeleteAccount = async () => {
+    setLoading(true);
+    setError(null);
+
+    try {
+      const response = await fetch(`${domain_name}/api/auth/profile/delete/`, {
+        method: "DELETE",
+        headers: {
+          Authorization: `Bearer ${authToken}`,
+        },
+      });
+
+      if (!response.ok) throw new Error("Failed to delete account.");
+
+      sessionStorage.clear();
+      navigate("/login"); // Redirect user after deletion
+    } catch (error) {
+      setError("An error occurred while deleting the account.");
+    } finally {
+      setLoading(false);
+      setOpenSnackbar(false); // Close Snackbar after action is completed
+    }
+  };
+
+  // Handle cancel deletion
+  const handleCancelDeletion = () => {
+    setOpenSnackbar(false); // Close Snackbar without deleting
+  };
+
   return (
     <>
       <Grid container spacing={3}>
         <Grid item xs={4}>
           <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-            Basic info
+            Basic Info
           </Typography>
         </Grid>
         <Grid item xs={8}>
           <Grid item xs={8}>
-            <IconButton
-              disableRipple
-              aria-label="avatar"
-              onClick={() => console.log("hi")}
-            >
+            <IconButton disableRipple aria-label="avatar">
               <Avatar
                 alt="Jack Sparrow"
                 src="https://images.pexels.com/photos/4016173/pexels-photo-4016173.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
@@ -30,21 +149,36 @@ export default function General() {
                   border: "3px solid lightseagreen",
                   height: "100px",
                   width: "100px",
-                  mb: 2
+                  mb: 2,
                 }}
               />
             </IconButton>
           </Grid>
-
           <Stack spacing={2}>
             <Stack direction="row" spacing={0.5}>
               <TextField
-                id="fullName"
+                id="firstName"
+                title="Enter your first name"
+                placeholder="First Name"
                 fullWidth
-                label="Full Name"
-                defaultValue="John Doe"
+                label="First Name"
+                value={firstName}
+                onChange={(e) => setFirstName(e.target.value)}
               />
-              <Button size="small">Save</Button>
+              <TextField
+                id="lastName"
+                fullWidth
+                label="Last Name"
+                value={lastName}
+                onChange={(e) => setLastName(e.target.value)}
+              />
+              <Button
+                size="small"
+                onClick={handleSaveFullName}
+                disabled={loading}
+              >
+                Save
+              </Button>
             </Stack>
             <Stack direction="row" spacing={0.5}>
               <TextField
@@ -53,51 +187,58 @@ export default function General() {
                 id="email"
                 fullWidth
                 label="Email Address"
-                defaultValue="example@example.com"
+                value={email}
               />
-              <Button size="small">Edit</Button>
             </Stack>
           </Stack>
         </Grid>
       </Grid>
+
+      {error && (
+        <Alert severity="error" onClose={() => setError(null)}>
+          {error}
+        </Alert>
+      )}
+      {loading && <CircularProgress />}
 
       <Divider light sx={{ mt: 4, mb: 4 }} />
 
       <Grid container spacing={3}>
         <Grid item xs={4}>
           <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-            Public profile
+            Public Profile
           </Typography>
         </Grid>
         <Grid item xs={8}>
-          <Stack
-            direction="row"
-            spacing={2}
-            justifyContent="space-between"
-            sx={{ mb: 2 }}
-          >
-            <Stack direction="column" spacing={0.5}>
-              <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                Make Contact Info Public
-              </Typography>
-              <Typography variant="subtitle2" color="text.secondary">
-                Means that anyone viewing your profile will be able to see your
-                contact details.
-              </Typography>
-            </Stack>
-            <Switch defaultChecked />
-          </Stack>
           <Stack direction="row" spacing={2} justifyContent="space-between">
-            <Stack direction="column" spacing={0.5}>
-              <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-                Available to hire
-              </Typography>
-              <Typography variant="subtitle2" color="text.secondary">
-                Toggling this will let your teammates know that you are
-                available for acquiring new projects.
-              </Typography>
-            </Stack>
-            <Switch defaultChecked />
+            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+              Make Contact Info Public
+            </Typography>
+            <Switch
+              checked={contactPublic}
+              onChange={(e) => {
+                setContactPublic(e.target.checked);
+                handleToggleSwitch("contact_public", e.target.checked);
+              }}
+            />
+          </Stack>
+          <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ mt: 2 }}>
+            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
+              Preferred Language
+            </Typography>
+            <Select
+              value={selectedLanguage}
+              onChange={(e) => {
+                setSelectedLanguage(e.target.value);
+                handleToggleSwitch("preferred_language", e.target.value);
+              }}
+              sx={{ minWidth: "150px" }}
+            >
+              <MenuItem value="English">English</MenuItem>
+              <MenuItem value="Spanish">Spanish</MenuItem>
+              <MenuItem value="French">French</MenuItem>
+              <MenuItem value="German">German</MenuItem>
+            </Select>
           </Stack>
         </Grid>
       </Grid>
@@ -111,24 +252,28 @@ export default function General() {
           </Typography>
         </Grid>
         <Grid item xs={8}>
-          <Stack direction="column" spacing={2}>
-            <Typography variant="body1" sx={{ fontWeight: "bold" }}>
-              Delete your account and all of your source data. This is
-              irreversible.
-            </Typography>
-
-            <Button
-              variant="outlined"
-              color="error"
-              sx={{ textTransform: "none", fontWeight: "bold", width: "20%" }}
-            >
-              Delete account
-            </Button>
-          </Stack>
+          <Button variant="outlined" color="error" onClick={() => setOpenSnackbar(true)}>
+            Delete Account
+          </Button>
         </Grid>
       </Grid>
 
-      <Divider light sx={{ mt: 4 }} />
+      <Snackbar
+        open={openSnackbar}
+        onClose={handleCancelDeletion}
+        message="Are you sure you want to delete your account? This action is irreversible."
+        action={
+          <>
+            <Button color="primary" size="small" onClick={handleCancelDeletion}>
+              Cancel
+            </Button>
+            <Button color="secondary" size="small" onClick={handleDeleteAccount}>
+              Confirm
+            </Button>
+          </>
+        }
+        autoHideDuration={null}
+      />
     </>
   );
 }

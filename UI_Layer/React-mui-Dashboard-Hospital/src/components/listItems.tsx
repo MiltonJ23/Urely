@@ -24,7 +24,7 @@ import InsertChartIcon from '@mui/icons-material/InsertChart';
 export const primarynavList = [
   {
     link: "/user-dashboard",
-    label: "User Dashboard",
+    label: "Dashboard",
     icon: <DashboardIcon />,
   },
   {

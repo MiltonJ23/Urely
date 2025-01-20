@@ -4,6 +4,18 @@ from django.db import models
 from django.db import models
 from django.conf import settings
 from datetime import timedelta, date
+from user.models import UserAccount  # Replace 'your_app' with the actual app name where UserAccount is defined
+
+
+# Patient model
+class Patient(models.Model):
+    user = models.OneToOneField(UserAccount, on_delete=models.CASCADE)
+    phone_number = models.CharField(max_length=15, null=True, blank=True)
+    address = models.TextField(null=True, blank=True)
+
+    def __str__(self):
+        return f"{self.user.first_name} {self.user.last_name}"
+
 
 
 class Doctor(models.Model):
@@ -65,6 +77,7 @@ class Appointment(models.Model):
     ]
 
     full_name = models.CharField(max_length=255)
+    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     phone = models.CharField(max_length=15, default='')  # To handle various phone formats
     age = models.PositiveIntegerField(default=0)

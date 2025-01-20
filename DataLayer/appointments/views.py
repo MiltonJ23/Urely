@@ -1,9 +1,11 @@
+from datetime import date
 from django.shortcuts import get_object_or_404
 from rest_framework import status
-from rest_framework.decorators import api_view, permission_classes
+from rest_framework.decorators import api_view, permission_classes, action
 from rest_framework.permissions import IsAuthenticated, AllowAny
 from rest_framework.response import Response
-from .models import Appointment, Doctor
+from rest_framework import viewsets
+from .models import Appointment, Doctor, Patient
 from .serializers import AppointmentSerializer, DoctorSerializer
 from rest_framework.views import APIView
 
@@ -209,3 +211,42 @@ class RecentAppointmentsView(APIView):
         recent_appointments = Appointment.objects.order_by('-appointment_date')[:7]
         serializer = AppointmentSerializer(recent_appointments, many=True)
         return Response(serializer.data, status=status.HTTP_200_OK)
+    
+
+
+class AppointmentViewSet(viewsets.ModelViewSet):
+    queryset = Appointment.objects.all()
+    serializer_class = AppointmentSerializer
+    permission_classes = [IsAuthenticated]
+
+    def get_queryset(self):
+        # Filter appointments based on the authenticated patient
+        patient = Patient.objects.get(user=self.request.user)
+        return Appointment.objects.filter(patient=patient)
+
+    def perform_create(self, serializer):
+        patient = Patient.objects.get(user=self.request.user)  # Get patient from authenticated user
+        serializer.save(patient=patient)
+
+    @action(detail=True, methods=['patch'])
+    def update_status(self, request, pk=None):
+        # Update the status of an appointment (e.g., from "Scheduled" to "Completed")
+        appointment = self.get_object()
+        status = request.data.get('status')
+        if status:
+            appointment.status = status
+            appointment.save()
+            return Response({"status": "Appointment status updated"})
+        return Response({"detail": "Status not provided"}, status=400)
+
+    @action(detail=False, methods=["get"])
+    def today(self, request):
+        # Retrieve today's appointments for the authenticated user (patient)
+        patient = Patient.objects.get(user=request.user)
+        today_appointments = Appointment.objects.filter(patient=patient, appointment_date__date=date.today())
+        if not today_appointments:
+            return Response({"detail": "No appointments today"}, status=404)
+        serializer = AppointmentSerializer(today_appointments, many=True)
+        return Response(serializer.data)
+    
+

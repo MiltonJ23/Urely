@@ -1,5 +1,6 @@
 from django.conf import settings
 from rest_framework.permissions import IsAuthenticated
+from rest_framework.status import HTTP_200_OK
 from rest_framework.generics import RetrieveAPIView
 from rest_framework.decorators import api_view, permission_classes
 from rest_framework.views import APIView
@@ -56,19 +57,60 @@ class ProfileView(APIView):
     permission_classes = [IsAuthenticated]
 
     def get(self, request):
-        """Retrieve user profile."""
         user = request.user
-        serializer = ProfileSerializer(user)
-        return Response(serializer.data, status=status.HTTP_200_OK)
+        return Response({
+            "first_name": user.first_name,
+            "last_name": user.last_name,
+            "email": user.email,
+            "contact_public": user.contact_public,
+            "available_to_hire": user.available_to_hire,
+            "preferred_language": user.preferred_language,
+        }, status=HTTP_200_OK)
 
-    def put(self, request):
-        """Update user profile."""
+
+class UpdateProfileView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [JSONParser]
+
+    def patch(self, request):
         user = request.user
-        serializer = ProfileSerializer(user, data=request.data, partial=True)
-        if serializer.is_valid():
-            serializer.save()
-            return Response(serializer.data, status=status.HTTP_200_OK)
-        return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
+        first_name = request.data.get("first_name", None)
+        last_name = request.data.get("last_name", None)
+
+        if first_name:
+            user.first_name = first_name
+        if last_name:
+            user.last_name = last_name
+
+        user.save()
+        return Response({"message": "Profile updated successfully."}, status=status.HTTP_200_OK)
+    
+
+class UpdateSettingsView(APIView):
+    permission_classes = [IsAuthenticated]
+    parser_classes = [JSONParser]
+
+    def patch(self, request):
+        user = request.user
+        contact_public = request.data.get("contact_public", None)
+        preferred_language = request.data.get("preferred_language", None)
+
+        if contact_public is not None:
+            user.profile.contact_public = contact_public
+        if preferred_language:
+            user.preferred_language = preferred_language
+
+        user.save()
+        return Response({"message": "Settings updated successfully."}, status=HTTP_200_OK)
+    
+class DeleteAccountView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def delete(self, request):
+        user = request.user
+        user.delete()
+        return Response({"message": "Account deleted successfully."}, status=status.HTTP_204_NO_CONTENT)
+
 
 class VerifyTokenView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -107,7 +149,7 @@ def profile_list(request):
 @api_view(['GET'])
 @permission_classes([IsAuthenticated])
 def get_user_details(request):
-    # The user is automatically fetched from the token
+    
     user = request.user
 
     # Serialize the user object to return relevant details

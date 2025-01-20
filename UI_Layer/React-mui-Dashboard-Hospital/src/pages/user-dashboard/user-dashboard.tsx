@@ -6,6 +6,21 @@
 // import Paper from "@mui/material/Paper";
 // import Appbar from "../../components/Appbar"; // Assuming Appbar is a reusable component
 
+import {
+  CircularProgress,
+  Box,
+  Toolbar,
+  Container,
+  Grid,
+  Paper,
+  Tooltip,
+} from "@mui/material";
+import axios from "axios";
+import { useState, useEffect } from "react";
+import Appbar from "../../components/Appbar";
+import HealthCard from "./HealthCard";
+import { ResponsiveContainer, BarChart, CartesianGrid, XAxis, YAxis, Legend, Bar } from "recharts";
+
 // import HealthCard from "./HealthCard";
 // import HealthAlert from "./HealthAlert";
 // import ActivityLog from "./ActivityLog";
@@ -144,56 +159,66 @@
 
 // src/pages/Dashboard.tsx
 
-import React from "react";
-import { Box, Container, Grid, Paper, Toolbar } from "@mui/material";
-import StepsIcon from "@mui/icons-material/DirectionsWalk";
-import CalorieIcon from "@mui/icons-material/LocalFireDepartment";
-import HealthTipsIcon from "@mui/icons-material/HealthAndSafety";
-import EarningsIcon from "@mui/icons-material/AttachMoney";
-import Appbar from "../../components/Appbar";
-import HealthCard from "./HealthCard";
-import StepsChart from "./StepsChart";
-import CaloriesChart from "./CaloriesChart";
-import UpcomingAppointments from "./UpcomingAppoinments";
-import WellnessActivities from "./WellnessActivities";
-import HealthMetricsIcon from "@mui/icons-material/FitnessCenter";
-
 interface CardData {
   icon: React.ReactNode;
   title: string;
   value: string | number;
 }
 
-
-const cardData: CardData[] = [
-  {
-    icon: <StepsIcon />,
-    title: "Steps Today",
-    value: 7500,
-  },
-  {
-    icon: <CalorieIcon />,
-    title: "Calories Burned",
-    value: 350,
-  },
-  {
-    icon: <HealthTipsIcon />,
-    title: "Health Tips",
-    value: "Drink more water today!",
-  },
-  {
-    icon: <HealthMetricsIcon />,
-    title: "Personalized insights",
-    value: "Monitor your key health metrics",
-  },
-];
-
-const chartData = [
-  { ChartComponent: <StepsChart /> },
-  { ChartComponent: <CaloriesChart /> },
-];
+interface DashboardData {
+  cardData: CardData[];
+  chartData: { ChartComponent: React.ReactNode }[];
+}
 
 const UserDashboard: React.FC = () => {
+  const [dashboardData, setDashboardData] = useState<DashboardData | null>(
+    null
+  );
+  const [loading, setLoading] = useState<boolean>(true);
+  const [error, setError] = useState<string | null>(null);
+
+  // Retrieve token from sessionStorage or localStorage
+  const token = sessionStorage.getItem("authToken");
+
+  useEffect(() => {
+    const fetchDashboardData = async () => {
+      if (!token) {
+        setError("No authentication token found.");
+        setLoading(false);
+        return;
+      }
+
+      const domain_name = "http://localhost:8000"; // Update with your backend URL
+
+      try {
+        const response = await axios.get(
+          `${domain_name}/api/health/dashboard/`,
+          {
+            headers: {
+              Authorization: `Bearer ${token}`,
+            },
+          }
+        );
+
+        if (response.status === 200) {
+          setDashboardData(response.data);
+        } else {
+          setError("Failed to fetch data.");
+        }
+      } catch (error) {
+        setError("Error fetching dashboard data.");
+        console.error("Error fetching dashboard data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchDashboardData();
+  }, [token]);
+
+  if (loading) return <CircularProgress />;
+  if (error) return <div>{error}</div>;
+
   return (
     <Box sx={{ display: "flex" }}>
       <Appbar appBarTitle="Health Dashboard" />
@@ -215,54 +240,69 @@ const UserDashboard: React.FC = () => {
         <Container sx={{ mt: 4, mb: 4 }}>
           <Grid container spacing={3}>
             {/* Cards */}
-            {cardData.map((item, index) => (
-              <Grid key={index} item xs={12} md={4} lg={3}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    height: 200,
-                  }}
-                >
-                  <HealthCard
-                    icon={item.icon}
-                    title={item.title}
-                    value={item.value}
-                  />
+            {dashboardData?.cardData?.length ? (
+              dashboardData.cardData.map((item, index) => (
+                <Grid key={index} item xs={12} md={4} lg={3}>
+                  <Paper
+                    sx={{
+                      p: 2,
+                      display: "flex",
+                      flexDirection: "column",
+                      height: 200,
+                    }}
+                  >
+                    <HealthCard
+                      icon={item.icon}
+                      title={item.title}
+                      value={item.value}
+                    />
+                  </Paper>
+                </Grid>
+              ))
+            ) : (
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2 }}>
+                  <div>No health data available for cards.</div>
                 </Paper>
               </Grid>
-            ))}
+            )}
 
             {/* Charts */}
-            {chartData.map((item, index) => (
-              <Grid key={index} item xs={12} md={6} lg={6}>
-                <Paper
-                  sx={{
-                    p: 2,
-                    display: "flex",
-                    flexDirection: "column",
-                    height: 400,
-                  }}
-                >
-                  {item.ChartComponent}
+            {/* Charts */}
+            {dashboardData?.chartData?.length ? (
+              dashboardData.chartData.map((chartItem, index) => (
+                <Grid key={index} item xs={12} md={6} lg={6}>
+                  <Paper
+                    sx={{
+                      p: 2,
+                      display: "flex",
+                      flexDirection: "column",
+                      height: 400,
+                    }}
+                  >
+                    <ResponsiveContainer width="100%" height="100%">
+                      <BarChart data={[chartItem]}>
+                        <CartesianGrid strokeDasharray="3 3" />
+                        <XAxis dataKey="name" />
+                        <YAxis />
+                        <Tooltip title="Tooltip">
+                          <span></span>
+                        </Tooltip>
+                        <Legend />
+                        <Bar dataKey="steps" fill="#8884d8" />
+                        <Bar dataKey="calories" fill="#82ca9d" />
+                      </BarChart>
+                    </ResponsiveContainer>
+                  </Paper>
+                </Grid>
+              ))
+            ) : (
+              <Grid item xs={12}>
+                <Paper sx={{ p: 2 }}>
+                  <div>No health data available for charts.</div>
                 </Paper>
               </Grid>
-            ))}
-
-            {/* Upcoming Appointments */}
-            <Grid item xs={12}>
-              <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                <UpcomingAppointments />
-              </Paper>
-            </Grid>
-
-            {/* Wellness Activities */}
-            <Grid item xs={12}>
-              <Paper sx={{ p: 2, display: "flex", flexDirection: "column" }}>
-                <WellnessActivities />
-              </Paper>
-            </Grid>
+            )}
           </Grid>
         </Container>
       </Box>
