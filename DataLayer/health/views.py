@@ -77,6 +77,29 @@ class ActivityLogViewSet(viewsets.ModelViewSet):
             return Response({"detail": "No activity log for today"}, status=404)
         serializer = self.get_serializer(log)
         return Response(serializer.data)
+    
+
+class TodayActivityLogView(APIView):
+    permission_classes = [IsAuthenticated]
+
+    def get(self, request):
+        # Get the authenticated user
+        user = request.user
+
+        # Query for today's activity logs
+        today = date.today()
+        activity_logs = ActivityLog.objects.filter(user=user, date=today)
+
+        # Aggregate data
+        total_steps = activity_logs.aggregate(Sum('steps_count'))['steps_count__sum'] or 0
+        total_calories = activity_logs.aggregate(Sum('calories_burned'))['calories_burned__sum'] or 0
+
+        # Prepare the response data
+        data = {
+            'steps': total_steps,
+            'calories': total_calories,
+        }
+        return Response(data, status=200)
 
 
 

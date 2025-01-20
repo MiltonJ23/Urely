@@ -1,6 +1,6 @@
 from django.urls import include, path
 from rest_framework.routers import DefaultRouter
-from .views import ActivityLogViewSet, WaterIntakeListCreateView, PhysicalActivityListCreateView, WeeklySummaryView, DashboardDataView
+from .views import ActivityLogViewSet, WaterIntakeListCreateView, PhysicalActivityListCreateView, WeeklySummaryView, DashboardDataView, TodayActivityLogView
 router = DefaultRouter()
 router.register(r"activity-logs", ActivityLogViewSet, basename="activity-log")
 
@@ -10,4 +10,5 @@ urlpatterns = [
     path('weekly-summary/', WeeklySummaryView.as_view(), name='weekly-summary'),
     path('dashboard/', DashboardDataView.as_view(), name='dashboard'),
     path("", include(router.urls)),
+    path('metrics/today/', TodayActivityLogView.as_view(), name='today'),
 ]

@@ -18,7 +18,7 @@ import CircularProgress from "@mui/material/CircularProgress";
 
 const ActivityLogs = () => {
   interface Log {
-    steps_covered: unknown;
+    steps_covered: number;
     water_intake: number;
     exercise_duration: number;
     medication_count: number;
@@ -40,7 +40,7 @@ const ActivityLogs = () => {
         }
 
         const response = await axios.get(
-          "http://localhost:8000/api/health/activity-logs/today/",
+          "http://localhost:8000/api/health/metrics/today/",
           {
             headers: {
               Authorization: `Bearer ${token}`,
@@ -92,9 +92,10 @@ const ActivityLogs = () => {
         if (!token) {
           throw new Error("No authentication token found.");
         }
+        const domain_name = 'http://localhost:8000';
 
         const response = await axios.put(
-          "http://localhost:8000/api/health/activity-logs/",
+          `${domain_name}/api/health/activity-logs/`,
           editValues,
           {
             headers: {
@@ -104,7 +105,7 @@ const ActivityLogs = () => {
         );
         if (response.data.length === 0) {
           await axios.post(
-            "http://localhost:8000/api/health/activity-logs/",
+            `${domain_name}/api/health/activity-logs/`,
             editValues,
             {
               headers: {
