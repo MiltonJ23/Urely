@@ -11,4 +11,5 @@ python-dotenv
 django-extensions
 SQLAlchemy
 python-dotenv
+gunicorn
 Pillow # for image upload
