@@ -17,3 +17,8 @@ dj-rest-auth
 social-auth-app-django 
 django-allauth
 python-dateutil
+pymongo[srv]
+djongo
+pymongo
+dnspython
+psycopg2-binary

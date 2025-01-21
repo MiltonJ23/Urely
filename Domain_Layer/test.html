@@ -38,7 +38,7 @@
                 statusElement.textContent = `You said: "${transcript}"`;
 
                 try {
-                    const response = await fetch('http://localhost:3000/talk-to-bot', {
+                    const response = await fetch('http://localhost:3001/talk-to-bot', {
                         method: 'POST',
                         headers: {
                             'Content-Type': 'application/json',

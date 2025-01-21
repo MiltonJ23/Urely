@@ -20,6 +20,8 @@ import { useNavigate } from "react-router-dom";
 export default function General() {
   const [firstName, setFirstName] = useState("");
   const [lastName, setLastName] = useState("");
+  const [file, setFile] = useState<File | null>(null);
+  const [preview, setPreview] = useState<string | null>(null);
   const [email, setEmail] = useState("");
   const [contactPublic, setContactPublic] = useState(true);
   const [availableToHire, setAvailableToHire] = useState(true);
@@ -77,6 +79,42 @@ export default function General() {
     } finally {
       setLoading(false);
     }
+  };
+
+  const handleFileChange = (event: React.ChangeEvent<HTMLInputElement>) => {
+    const selectedFile = event.target.files?.[0];
+    if (selectedFile) {
+      setFile(selectedFile);
+      setPreview(URL.createObjectURL(selectedFile)); // Generate a preview URL for the file
+    }
+  };
+
+  const handleUpload = () => {
+    if (!file) {
+      alert("Please select a file before uploading!");
+      return;
+    }
+
+    // Perform the file upload logic here
+    const formData = new FormData();
+    formData.append("profile", file);
+
+    // Example of an API call
+    fetch("http://localhost:8000/api/upload-profile/", {
+      method: "POST",
+      body: formData,
+    })
+      .then((response) => {
+        if (response.ok) {
+          alert("Profile uploaded successfully!");
+        } else {
+          alert("Failed to upload profile.");
+        }
+      })
+      .catch((error) => {
+        console.error("Upload error:", error);
+        alert("An error occurred during upload.");
+      });
   };
 
   const handleToggleSwitch = async (
@@ -143,8 +181,8 @@ export default function General() {
           <Grid item xs={8}>
             <IconButton disableRipple aria-label="avatar">
               <Avatar
-                alt="Jack Sparrow"
-                src="https://images.pexels.com/photos/4016173/pexels-photo-4016173.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
+                alt="Profile Pic"
+                // src="https://images.pexels.com/photos/4016173/pexels-photo-4016173.jpeg?auto=compress&cs=tinysrgb&dpr=1&w=500"
                 sx={{
                   border: "3px solid lightseagreen",
                   height: "100px",
@@ -153,6 +191,20 @@ export default function General() {
                 }}
               />
             </IconButton>
+            <Button
+              variant="outlined"
+              onClick={handleUpload}
+              sx={{
+                mt: 2,
+                color: "#1976d2",
+                borderColor: "#1976d2",
+                "&:hover": {
+                  backgroundColor: "#e3f2fd",
+                },
+              }}
+            >
+              Upload Profile
+            </Button>
           </Grid>
           <Stack spacing={2}>
             <Stack direction="row" spacing={0.5}>
@@ -222,7 +274,12 @@ export default function General() {
               }}
             />
           </Stack>
-          <Stack direction="row" spacing={2} justifyContent="space-between" sx={{ mt: 2 }}>
+          <Stack
+            direction="row"
+            spacing={2}
+            justifyContent="space-between"
+            sx={{ mt: 2 }}
+          >
             <Typography variant="body1" sx={{ fontWeight: "bold" }}>
               Preferred Language
             </Typography>
@@ -252,7 +309,11 @@ export default function General() {
           </Typography>
         </Grid>
         <Grid item xs={8}>
-          <Button variant="outlined" color="error" onClick={() => setOpenSnackbar(true)}>
+          <Button
+            variant="outlined"
+            color="error"
+            onClick={() => setOpenSnackbar(true)}
+          >
             Delete Account
           </Button>
         </Grid>
@@ -267,7 +328,11 @@ export default function General() {
             <Button color="primary" size="small" onClick={handleCancelDeletion}>
               Cancel
             </Button>
-            <Button color="secondary" size="small" onClick={handleDeleteAccount}>
+            <Button
+              color="secondary"
+              size="small"
+              onClick={handleDeleteAccount}
+            >
               Confirm
             </Button>
           </>

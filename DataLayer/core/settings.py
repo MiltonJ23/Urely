@@ -96,9 +96,10 @@ WSGI_APPLICATION = 'core.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.sqlite3',
-        'NAME': BASE_DIR / 'db.sqlite3',
+        'NAME': BASE_DIR / 'db.sqlite3',  # This creates the SQLite database file in your project directory
     }
 }
+
 
 CORS_ALLOW_ALL_ORIGINS = True
 
