@@ -12,6 +12,7 @@ import {
   MenuItem,
   FormControl,
   Select,
+  FormHelperText,
 } from "@mui/material";
 import { TransitionProps } from "@mui/material/transitions";
 import AddIcon from "@mui/icons-material/Add";
@@ -50,12 +51,41 @@ export default function AppointmentDialog({
     null
   );
 
+  type Doctor = {
+    id: string;
+    name: string;
+  };
+  
+  const [doctors, setDoctors] = React.useState<Doctor[]>([]);
+  const [loading, setLoading] = React.useState(false)
+
   const {
     register,
     handleSubmit,
     setValue,
     formState: { errors },
   } = useForm<FormValues>();
+
+  React.useEffect(() => {
+    // Fetch the list of doctors from the backend
+    const fetchDoctors = async () => {
+      setLoading(true);
+      try {
+        const response = await axios.get('http://localhost:8000/api/appointments/doctors/');  // Adjust the API endpoint accordingly
+        setDoctors(response.data);  // Assuming the response returns an array of doctors
+        console.log(response.data);
+      } catch (error) {
+        console.error('Error fetching doctors:', error);
+      } finally {
+        setLoading(false);
+      }
+    };
+    
+    fetchDoctors();
+  }, []);
+
+
+
 
   React.useEffect(() => {
     const fetchUserData = async () => {
@@ -104,7 +134,8 @@ export default function AppointmentDialog({
     const completeData = {
       ...data,
       appointmentDate, // Add the selected date
-      id: (appointments.length + 1).toString(), // Generate a new ID
+      id: (appointments.length + 1).toString(),
+      patient: data.fullName,
     };
 
     const token = sessionStorage.getItem("authToken"); // Retrieve token from sessionStorage
@@ -168,7 +199,7 @@ export default function AppointmentDialog({
           <DialogContent dividers>
             <TextField
               margin="dense"
-              id="fullName"
+              id="full_name"
               label="Full Name"
               fullWidth
               variant="outlined"
@@ -220,30 +251,55 @@ export default function AppointmentDialog({
               />
               ;
             </LocalizationProvider>
-            <TextField
-              margin="dense"
-              id="referredByDoctor"
-              label="Referred By Doctor"
+            <FormControl
               fullWidth
-              variant="outlined"
-              {...register("referredByDoctor", {
-                required: "Referred By Doctor is required",
-              })}
+              margin="dense"
               error={!!errors.referredByDoctor}
-              helperText={errors.referredByDoctor?.message}
-            />
-            <TextField
-              margin="dense"
-              id="assignedDoctor"
-              label="Assigned Doctor"
+            >
+              <InputLabel id="referredByDoctor-label">
+                Referred By Doctor
+              </InputLabel>
+              <Select
+                labelId="referredByDoctor-label"
+                id="referredByDoctor"
+                label="Referred By Doctor"
+                {...register("referredByDoctor", {
+                  required: "Referred By Doctor is required",
+                })}
+              >
+                {doctors.map((doctor) => (
+                  <MenuItem key={doctor.id} value={doctor.id}>
+                    {doctor.name}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>
+                {errors.referredByDoctor?.message}
+              </FormHelperText>
+            </FormControl>
+
+            <FormControl
               fullWidth
-              variant="outlined"
-              {...register("assignedDoctor", {
-                required: "Assigned Doctor is required",
-              })}
+              margin="dense"
               error={!!errors.assignedDoctor}
-              helperText={errors.assignedDoctor?.message}
-            />
+            >
+              <InputLabel id="assignedDoctor-label">Assigned Doctor</InputLabel>
+              <Select
+                labelId="assignedDoctor-label"
+                id="assignedDoctor"
+                label="Assigned Doctor"
+                {...register("assignedDoctor", {
+                  required: "Assigned Doctor is required",
+                })}
+              >
+                {doctors.map((doctor) => (
+                  <MenuItem key={doctor.id} value={doctor.id}>
+                    {doctor.name}
+                  </MenuItem>
+                ))}
+              </Select>
+              <FormHelperText>{errors.assignedDoctor?.message}</FormHelperText>
+            </FormControl>
           </DialogContent>
           <DialogActions>
             <Button onClick={handleClose}>Cancel</Button>

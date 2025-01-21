@@ -13,3 +13,7 @@ SQLAlchemy
 python-dotenv
 gunicorn
 Pillow # for image upload
+dj-rest-auth 
+social-auth-app-django 
+django-allauth
+python-dateutil

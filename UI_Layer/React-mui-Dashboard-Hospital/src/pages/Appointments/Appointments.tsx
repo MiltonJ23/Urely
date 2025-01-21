@@ -15,12 +15,13 @@ function Appointments() {
   const fetchAppointments = async () => {
     try {
       const token = sessionStorage.getItem("authToken");
-      const response = await apiClient.get("/appointments/", {
+      const response = await axios.get("http://localhost:8000/api/appointments/", {
         headers: {
           Authorization: `Bearer ${token}`,
         },
       });
-      console.log(response.data);
+      console.log('appointments', response.data);
+      setAppointments(response.data);
     } catch (error) {
       console.error("Failed to fetch appointments:", error);
     }

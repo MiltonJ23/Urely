@@ -14,6 +14,15 @@ interface Appointment {
   patientName: string;
   date: string;
   status: string;
+  full_name: string;
+  gender: string;
+  phone: string;
+  age: number;
+  address: string;
+  email: string;
+  referred_by_doctor: number;
+  assigned_doctor: number;
+  appointment_date: string;
 }
 
 export default function LatestAppointments() {

@@ -1,4 +1,4 @@
-import React from "react";
+import React, { useEffect, useState } from "react";
 import { Paper, Chip } from "@mui/material";
 import {
   Table,
@@ -9,7 +9,57 @@ import {
   TableRow
 } from "@mui/material";
 
-function AppointmentTableData({ appointments }: any) {
+
+interface Doctor {
+  id: number;
+  name: string;
+}
+
+interface Appointment {
+  id: number;
+  full_name: string;
+  gender: string;
+  phone: string;
+  age: number;
+  referred_by_doctor: number;
+  assigned_doctor: number;
+  appointment_date: string;
+  status: string;
+}
+
+function AppointmentTableData({ appointments }: { appointments: Appointment[] }) {
+  const [doctors, setDoctors] = useState<Doctor[]>([]);
+  const [doctorNames, setDoctorNames] = useState<{ [key: number]: string }>({});
+
+  useEffect(() => {
+    const fetchDoctors = async () => {
+      try {
+        const response = await fetch("http://localhost:8000/api/appointments/doctors/");
+        const data = await response.json();
+        setDoctors(data); // Set the list of doctors
+      } catch (error) {
+        console.error("Error fetching doctors:", error);
+      }
+    };
+
+    fetchDoctors();
+  }, []);
+
+  const getDoctorNameById = async (doctorId: number): Promise<void> => {
+    if (!doctorNames[doctorId]) {
+      try {
+        const response = await fetch(`http://localhost:8000/api/doctor/${doctorId}/`);
+        const data = await response.json();
+        setDoctorNames((prevNames) => ({
+          ...prevNames,
+          [doctorId]: data.name,
+        }));
+      } catch (error) {
+        console.error("Error fetching doctor:", error);
+      }
+    }
+  };
+
   return (
     <TableContainer component={Paper}>
       <Table sx={{ minWidth: 650 }} aria-label="patient table">
@@ -28,31 +78,35 @@ function AppointmentTableData({ appointments }: any) {
         </TableHead>
         <TableBody>
           {appointments.length > 0 &&
-            appointments.map((appointment: any, index: any) => (
-              <TableRow
-                key={index}
-                // component={Link}
-                // to={`/patient-detail/${appointment.id}`}
-                style={{ textDecoration: "none", color: "inherit" }}
-              >
-                <TableCell align="center">{appointment.id}</TableCell>
-                <TableCell>{appointment.fullName}</TableCell>
-                <TableCell>{appointment.gender}</TableCell>
-                <TableCell>{appointment.phone}</TableCell>
-                <TableCell>{appointment.age}</TableCell>
-                <TableCell>{appointment.referredByDoctor}</TableCell>
-                <TableCell>{appointment.appointmentDate}</TableCell>
-                <TableCell>{appointment.assignedDoctor}</TableCell>
-                <TableCell>
-                  <Chip
-                    label={appointment.status}
-                    variant="outlined"
-                    color={appointment.status === "open" ? "success" : "error"}
-                    sx={{ textTransform: "uppercase" }}
-                  />
-                </TableCell>
-              </TableRow>
-            ))}
+            appointments.map((appointment: Appointment, index: number) => {
+              getDoctorNameById(appointment.referred_by_doctor);
+              getDoctorNameById(appointment.assigned_doctor);
+
+              return (
+                <TableRow key={index} style={{ textDecoration: "none", color: "inherit" }}>
+                  <TableCell align="center">{appointment.id}</TableCell>
+                  <TableCell>{appointment.full_name}</TableCell>
+                  <TableCell>{appointment.gender}</TableCell>
+                  <TableCell>{appointment.phone}</TableCell>
+                  <TableCell>{appointment.age}</TableCell>
+                  <TableCell>
+                    {doctorNames[appointment.referred_by_doctor] || "Loading..."}
+                  </TableCell>
+                  <TableCell>{appointment.appointment_date}</TableCell>
+                  <TableCell>
+                    {doctorNames[appointment.assigned_doctor] || "Loading..."}
+                  </TableCell>
+                  <TableCell>
+                    <Chip
+                      label={appointment.status}
+                      variant="outlined"
+                      color={appointment.status === "open" ? "success" : "error"}
+                      sx={{ textTransform: "uppercase" }}
+                    />
+                  </TableCell>
+                </TableRow>
+              );
+            })}
         </TableBody>
       </Table>
     </TableContainer>

@@ -1,4 +1,5 @@
 from datetime import date
+from django.forms import ValidationError
 from django.http import JsonResponse
 from rest_framework.response import Response
 from rest_framework import generics, viewsets
@@ -93,13 +94,37 @@ class TodayActivityLogView(APIView):
         # Aggregate data
         total_steps = activity_logs.aggregate(Sum('steps_count'))['steps_count__sum'] or 0
         total_calories = activity_logs.aggregate(Sum('calories_burned'))['calories_burned__sum'] or 0
+        total_exercise = activity_logs.aggregate(Sum('exercise_duration'))['exercise_duration__sum'] or 0
+        total_medication = activity_logs.aggregate(Sum('medication_count'))['medication_count__sum'] or 0
+        water_intake = activity_logs.aggregate(Sum('water_intake'))['water_intake__sum'] or 0
+        food_intake = activity_logs.aggregate(Sum('food_intake'))['food_intake__sum'] or 0
 
         # Prepare the response data
         data = {
-            'steps': total_steps,
-            'calories': total_calories,
+            'steps_covered': total_steps,
+            'calories_burned': total_calories,
+            'exercise_duration': total_exercise,
+            'medication_count': total_medication,
+            'water_intake': water_intake,
+            'food_intake': food_intake
         }
         return Response(data, status=200)
+    
+    def put(self, request):
+        # Get the authenticated user
+        user = request.user
+
+        # Query or create today's activity log
+        today = date.today()
+        activity_log, created = ActivityLog.objects.get_or_create(user=user, date=today)
+
+        # Use a serializer to validate and update the data
+        serializer = ActivityLogSerializer(activity_log, data=request.data, partial=True)
+        if serializer.is_valid():
+            serializer.save()
+            return Response(serializer.data, status=200 if not created else 201)
+        else:
+            raise ValidationError(serializer.errors)
 
 
 

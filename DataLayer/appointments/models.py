@@ -22,10 +22,12 @@ class Doctor(models.Model):
     name = models.CharField(max_length=100)
     specialty = models.CharField(max_length=100)
     phone_number = models.CharField(max_length=15)
+    email = models.EmailField(unique=True)
     description = models.CharField(max_length=500)
     experience = models.IntegerField(default=0)
     patients_count = models.PositiveBigIntegerField(default=0)
     image = models.ImageField(upload_to='doctors/', default='doctors/default.png')
+    location = models.CharField(max_length=255)
 
     def __str__(self):
         return self.name
@@ -75,9 +77,13 @@ class Appointment(models.Model):
         ('Female', 'Female'),
         ('Other', 'Other'),
     ]
+    STATUS_CHOICES = [
+        ('Pending', 'Pending'),
+        ('Confirmed', 'Confirmed'),
+        ('Cancelled', 'Cancelled'),
+    ]
 
     full_name = models.CharField(max_length=255)
-    patient = models.ForeignKey(Patient, on_delete=models.CASCADE)
     gender = models.CharField(max_length=10, choices=GENDER_CHOICES)
     phone = models.CharField(max_length=15, default='')  # To handle various phone formats
     age = models.PositiveIntegerField(default=0)
@@ -93,6 +99,9 @@ class Appointment(models.Model):
     )
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
+    status = models.CharField(
+        max_length=20, choices=STATUS_CHOICES, default='Pending'
+    )
 
     def __str__(self):
         return f"{self.full_name} - {self.appointment_date}"

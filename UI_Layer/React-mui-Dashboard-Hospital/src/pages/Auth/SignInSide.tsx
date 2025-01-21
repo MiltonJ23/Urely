@@ -4,6 +4,7 @@ import Button from "@mui/material/Button";
 import TextField from "@mui/material/TextField";
 import FormControlLabel from "@mui/material/FormControlLabel";
 import Checkbox from "@mui/material/Checkbox";
+import { useGoogleLogin } from "@react-oauth/google";
 //import Link from "@mui/material/Link";
 import Paper from "@mui/material/Paper";
 import Box from "@mui/material/Box";
@@ -18,6 +19,8 @@ import { Divider } from "@mui/material";
 import HeartRateLoader from "../../components/HeartRateLoader";
 import { useForm } from "react-hook-form";
 import isTokenExpired from "../../components/token";
+import GoogleLoginButton from "./LoginWithGoogle";
+import { GoogleOAuthProvider } from "@react-oauth/google";
 
 type FormValues = {
   email: string;
@@ -234,7 +237,7 @@ export default function SignInSide() {
 
       const { access, refresh } = response.data;
 
-      // Store tokens in sessionStorage 
+      // Store tokens in sessionStorage
       sessionStorage.setItem("authToken", access);
       sessionStorage.setItem("refreshToken", refresh);
 
@@ -261,7 +264,7 @@ export default function SignInSide() {
 
       const { is_staff } = userResponse.data;
       console.log("User details:", is_staff);
-      
+
       // Navigate based on user role
       if (is_staff) {
         navigate("/dashboard");
@@ -390,15 +393,9 @@ export default function SignInSide() {
                 <Divider sx={{ mt: 2 }} light variant="middle">
                   OR
                 </Divider>
-                <Button
-                  fullWidth
-                  startIcon={<GoogleIcon />}
-                  variant="outlined"
-                  sx={{ mt: 2 }}
-                >
-                  Continue with Google
-                </Button>
-
+                <GoogleOAuthProvider clientId={process.env.REACT_APP_OAUTH_CLIENT_ID || ""}>
+                  <GoogleLoginButton />
+                </GoogleOAuthProvider>
                 <Button
                   fullWidth
                   startIcon={<FacebookIcon />}

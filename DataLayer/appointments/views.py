@@ -8,29 +8,47 @@ from rest_framework import viewsets
 from .models import Appointment, Doctor, Patient
 from .serializers import AppointmentSerializer, DoctorSerializer
 from rest_framework.views import APIView
+from rest_framework.generics import CreateAPIView, DestroyAPIView, ListAPIView, UpdateAPIView
+from dateutil.parser import parse
 
 # Create an appointment
 @api_view(['POST'])
-@permission_classes([IsAuthenticated])  # Ensure user is authenticated
+@permission_classes([IsAuthenticated])
 def create_appointment(request):
-    """
-    Create an appointment for an authenticated user.
-    """
-    doctor_id = request.data.get('doctor_id')
-    appointment_date = request.data.get('date')
+    data = request.data
 
-    # Validate inputs
-    if not doctor_id or not appointment_date:
-        return Response({"error": "Doctor ID and date are required."}, status=status.HTTP_400_BAD_REQUEST)
-    
-    # Fetch the doctor or return a 404 error
-    doctor = get_object_or_404(Doctor, id=doctor_id)
+    # Validate required fields
+    required_fields = [
+        "fullName", "gender", "phone", "age", 
+        "appointmentDate", "referredByDoctor", "assignedDoctor"
+    ]
+    for field in required_fields:
+        if field not in data or not data[field]:
+            return Response({"error": f"{field} is required."}, status=status.HTTP_400_BAD_REQUEST)
 
-    # Create and save the appointment
-    appointment = Appointment(user=request.user, doctor=doctor, date=appointment_date)
-    appointment.save()
+    # Parse the appointment date
+    try:
+        appointment_date = parse(data["appointmentDate"]).date()
+    except ValueError:
+        return Response(
+            {"error": "Invalid appointmentDate format. Use YYYY-MM-DD."},
+            status=status.HTTP_400_BAD_REQUEST,
+        )
 
-    return Response(AppointmentSerializer(appointment).data, status=status.HTTP_201_CREATED)
+    # Create the appointment object
+    appointment = Appointment.objects.create(
+        full_name=data["fullName"],
+        gender=data["gender"],
+        phone=data["phone"],
+        age=int(data["age"]),
+        appointment_date=appointment_date,
+        referred_by_doctor=data["referredByDoctor"],
+        assigned_doctor=data["assignedDoctor"],
+        user=request.user,
+    )
+
+    serializer = AppointmentSerializer(appointment)
+    return Response(serializer.data, status=status.HTTP_201_CREATED)
 
 
 # View all appointments for the authenticated user
@@ -130,17 +148,6 @@ def list_doctors(request):
     serializer = DoctorSerializer(doctors, many=True)
     return Response(serializer.data)
 
-
-# Get a specific doctor by ID
-@api_view(['GET'])
-@permission_classes([IsAuthenticated])  # Ensure user is authenticated
-def get_doctor(request, doctor_id):
-    """
-    Retrieve details of a specific doctor by their ID.
-    """
-    doctor = get_object_or_404(Doctor, id=doctor_id)
-    serializer = DoctorSerializer(doctor)
-    return Response(serializer.data)
 
 
 # Update a doctor's details
@@ -250,3 +257,67 @@ class AppointmentViewSet(viewsets.ModelViewSet):
         return Response(serializer.data)
     
 
+
+class AppointmentCreateView(CreateAPIView):
+    """
+    View to create a new appointment for the authenticated user.
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = AppointmentSerializer
+
+    def perform_create(self, serializer):
+        serializer.save(user=self.request.user)
+
+
+class AppointmentUpdateView(UpdateAPIView):
+    """
+    View to update an existing appointment.
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = AppointmentSerializer
+
+    def get_queryset(self):
+        return Appointment.objects.filter(user=self.request.user)
+
+
+class AppointmentDeleteView(DestroyAPIView):
+    """
+    View to delete an appointment.
+    """
+    permission_classes = [IsAuthenticated]
+    serializer_class = AppointmentSerializer
+
+    def get_queryset(self):
+        return Appointment.objects.filter(user=self.request.user)
+    
+
+class MarkCheckedInView(APIView):
+    """
+    Custom view to mark an appointment as checked-in.
+    """
+    permission_classes = [IsAuthenticated]
+
+    def post(self, request, pk):
+        appointment = get_object_or_404(Appointment, pk=pk, user=request.user)
+        # Add your custom logic here (e.g., updating a status field)
+        appointment.checked_in = True  # Assuming a field 'checked_in'
+        appointment.save()
+        return Response({"message": "Appointment marked as checked-in"}, status=status.HTTP_200_OK)
+    
+
+
+@api_view(['GET'])
+def get_doctor_by_id(request, doctor_id):
+    """
+    Get doctor details by ID.
+    """
+    try:
+        # Fetch the doctor by ID
+        doctor = Doctor.objects.get(id=doctor_id)
+    except Doctor.DoesNotExist:
+        # If doctor does not exist, return a 404 response
+        return Response({"error": "Doctor not found"}, status=status.HTTP_404_NOT_FOUND)
+
+    # Serialize the doctor data and return it
+    serializer = DoctorSerializer(doctor)
+    return Response(serializer.data)

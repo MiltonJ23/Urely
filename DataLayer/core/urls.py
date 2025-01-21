@@ -24,6 +24,7 @@ urlpatterns = [
     path('api/auth/', include('user.urls')),
     path('api/health/', include('health.urls')),
     path('api/appointments/', include('appointments.urls')),
+    path('auth/google/', include('allauth.socialaccount.urls')),
 ]
 
 if settings.DEBUG:
