@@ -1,17 +1,20 @@
+// Inside LatestAppointments.tsx
+
 import * as React from "react";
 import Link from "@mui/material/Link";
 import Typography from "@mui/material/Typography";
-import Title from "../../components/Title";
-import AppointmentTableData from "../Appointments/AppointmentTableData";
-import { appointmentsData } from "../../mockData";
+import AppointmentTableData from "../Appointments/AppointmentTableData"; // Assuming this is correct
+import { appointmentsData } from "../../mockData"; // Ensure this is available
 import { useNavigate } from "react-router-dom";
 
-export default function LatestAppointments() {
+const LatestAppointments = () => {
   const navigate = useNavigate();
+
   function preventDefault(event: React.MouseEvent) {
     event.preventDefault();
     navigate(`/appointments`);
   }
+
   return (
     <React.Fragment>
       <Typography
@@ -29,4 +32,6 @@ export default function LatestAppointments() {
       </Link>
     </React.Fragment>
   );
-}
+};
+
+export default LatestAppointments; // Ensure this is exported as default

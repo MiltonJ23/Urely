@@ -6,12 +6,11 @@ from rest_framework import status
 from rest_framework.permissions import AllowAny
 from rest_framework_simplejwt.tokens import RefreshToken
 from rest_framework_simplejwt.authentication import JWTAuthentication
-from .serializers import ProfileSerializer, UserRegistrationSerializer, UserSerializer
+from .serializers import *
 from django.http import HttpResponse, JsonResponse
 from django.views.decorators.csrf import csrf_exempt
 from rest_framework.parsers import JSONParser
 from user.models import Profile,Clinic,HealthLog,Appointment
-from user.serializer import ProfileSerializer,ClinicSerializer,HealthSerializer,AppointmentSerializer
 
 class UserRegistrationView(APIView):
     permission_classes = [AllowAny]
@@ -64,13 +63,6 @@ class ProfileView(APIView):
             serializer.save()
             return Response(serializer.data, status=status.HTTP_200_OK)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
-    
-    def post(request):
-            serializer = AppointmentSerializer(data=request.data)
-            if serializer.is_valid():
-                serializer.save()
-                return Response(serializer.data, status=201)
-            return Response(serializer.errors, status=400)
 
 class VerifyTokenView(APIView):
     authentication_classes = [JWTAuthentication]
@@ -90,11 +82,30 @@ class VerifyTokenView(APIView):
         })
 
 
-class ClinicList(APIView):        
-        def get(request):
-            snippets = Clinic.objects.all()
-            serializer = ClinicSerializer(snippets, many=True)
-            return Response(serializer.data, safe=False)
+@csrf_exempt
+def profile_list(request):
+    if request.method == 'GET':
+        profile = Profile.objects.all()
+        serializer = ProfileSerializer(profile, many=True)
+        return JsonResponse(serializer.data, safe=False)
+
+    elif request.method == 'POST':
+        data = JSONParser().parse(request)
+        serializer = ProfileSerializer(data=data)
+        if serializer.is_valid():
+            serializer.save()
+            return JsonResponse(serializer.data, status=201)
+        return JsonResponse(serializer.errors, status=400)
+    
+@csrf_exempt
+def clinic_list(request):
+    """
+    List all code snippets, or create a new snippet.
+    """
+    if request.method == 'GET':
+        snippets = Clinic.objects.all()
+        serializer = ClinicSerializer(snippets, many=True)
+        return JsonResponse(serializer.data, safe=False)
 
         def post(request):
             serializer = ClinicSerializer(data=request.data)

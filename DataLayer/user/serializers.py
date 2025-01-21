@@ -1,4 +1,4 @@
-from .models import UserAccount
+from .models import Appointment, Clinic, HealthLog, UserAccount
 from rest_framework import serializers
 from rest_framework.fields import CharField, EmailField
 
@@ -31,3 +31,19 @@ class ProfileSerializer(serializers.ModelSerializer):
         model = UserAccount
         fields = ['first_name', 'last_name', 'email', 'preferred_language']
         read_only_fields = ['email']
+
+
+class ClinicSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Clinic
+        fields = ['id', 'name', 'address', 'phone_number', 'email', 'opening_hours', 'closing_hours']
+
+class HealthSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = HealthLog
+        fields = ['id', 'patient']
+
+class AppointmentSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = Appointment
+        fields = ['id', 'patient', 'clinic', 'date', 'time', 'reason', 'status']

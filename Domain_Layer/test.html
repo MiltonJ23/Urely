@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Speech Recognition with Amazon Lex</title>
+</head>
+<body>
+    <h1>Talk to the Bot</h1>
+    <button id="start-recognition" type="button">Start Voice Input</button>
+    <p id="status">Press the button and speak...</p>
+    <p id="bot-response"></p>
+
+    <script>
+        const startRecognitionButton = document.getElementById('start-recognition');
+        const statusElement = document.getElementById('status');
+        const botResponseElement = document.getElementById('bot-response');
+
+        // Check if the browser supports speech recognition
+        const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+
+        if (!SpeechRecognition) {
+            alert('Your browser does not support speech recognition. Please use a supported browser.');
+        } else {
+            const recognition = new SpeechRecognition();
+            recognition.lang = 'en-US';
+
+            // Start recognition when button is clicked
+            startRecognitionButton.addEventListener('click', () => {
+                statusElement.textContent = 'Listening...';
+                recognition.start();
+            });
+
+            // Handle speech recognition results
+            recognition.onresult = async (event) => {
+                const transcript = event.results[0][0].transcript;
+                console.log('Transcript:', transcript);
+                statusElement.textContent = `You said: "${transcript}"`;
+
+                try {
+                    const response = await fetch('http://localhost:3000/talk-to-bot', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                        },
+                        body: JSON.stringify({ userInput: transcript }),
+                    });
+
+                    const data = await response.json();
+
+                    if (response.ok) {
+                        const botMessage = data.message;
+
+                        // Update the text content
+                        botResponseElement.textContent = `Bot says: "${botMessage}"`;
+
+                        // Speak the bot's response
+                        const utterance = new SpeechSynthesisUtterance(botMessage);
+                        utterance.lang = "en-US"; // Set the language
+                        window.speechSynthesis.speak(utterance);
+                    } else {
+                        const errorMessage = `Error: ${data.error}`;
+
+                        // Update the text content
+                        botResponseElement.textContent = errorMessage;
+
+                        // Optionally, speak the error message
+                        const utterance = new SpeechSynthesisUtterance(errorMessage);
+                        utterance.lang = "en-US";
+                        window.speechSynthesis.speak(utterance);
+                    }
+
+                } catch (error) {
+                    botResponseElement.textContent = 'Failed to communicate with the server.';
+                    console.error('Error:', error);
+                }
+            };
+
+            // Handle recognition errors
+            recognition.onerror = (event) => {
+                statusElement.textContent = `Error: ${event.error}`;
+            };
+
+            // Reset status when recognition ends
+            recognition.onend = () => {
+                statusElement.textContent = 'Press the button and speak...';
+            };
+        }
+    </script>
+</body>
+</html>

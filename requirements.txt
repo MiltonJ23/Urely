@@ -5,3 +5,6 @@ djangorestframework-simplejwt
 requests
 django_filter
 django-cors-headers
+pyaudio
+speechrecognition
+python-dotenv
