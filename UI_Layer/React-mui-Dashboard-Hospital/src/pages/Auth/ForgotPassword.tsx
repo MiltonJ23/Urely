@@ -24,7 +24,7 @@ export default function ForgotPassword() {
 
   const onSubmit = async (data: FormValues) => {
     try {
-      const response = await axios.post("http://localhost:8000/api/auth/forgot-password/", {
+      const response = await axios.post(`${process.env.REACT_APP_API_URL}/api/auth/forgot-password/`, {
         email: data.email,
       });
       console.log("Password reset link sent:", response.data);

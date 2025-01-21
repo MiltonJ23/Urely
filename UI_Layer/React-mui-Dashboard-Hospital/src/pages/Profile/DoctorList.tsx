@@ -21,7 +21,7 @@ export default function DoctorList() {
   const [error, setError] = React.useState<string | null>(null);  // For handling errors
 
   React.useEffect(() => {
-    const domain_name = 'htpp://localhost';
+    const domain_name = process.env.REACT_APP_API_URL || 'http://localhost';
     const fetchDoctors = async () => {
       try {
         const token = sessionStorage.getItem("authToken");

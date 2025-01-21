@@ -6,9 +6,8 @@ import {
   TableCell,
   TableContainer,
   TableHead,
-  TableRow
+  TableRow,
 } from "@mui/material";
-
 
 interface Doctor {
   id: number;
@@ -27,14 +26,40 @@ interface Appointment {
   status: string;
 }
 
-function AppointmentTableData({ appointments }: { appointments: Appointment[] }) {
+function AppointmentTableData({
+  appointments,
+}: {
+  appointments: Appointment[];
+}) {
   const [doctors, setDoctors] = useState<Doctor[]>([]);
   const [doctorNames, setDoctorNames] = useState<{ [key: number]: string }>({});
 
+  const domain_name = process.env.REACT_APP_API_URL || "http://localhost:8000";
   useEffect(() => {
     const fetchDoctors = async () => {
+      const token = sessionStorage.getItem("authToken"); // Retrieve the token
+
+      if (!token) {
+        console.error("Authentication token is missing.");
+        return;
+      }
+
       try {
-        const response = await fetch("http://localhost:8000/api/appointments/doctors/");
+        const response = await fetch(
+          `${domain_name}/api/appointments/doctors/`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         setDoctors(data); // Set the list of doctors
       } catch (error) {
@@ -47,8 +72,29 @@ function AppointmentTableData({ appointments }: { appointments: Appointment[] })
 
   const getDoctorNameById = async (doctorId: number): Promise<void> => {
     if (!doctorNames[doctorId]) {
+      const token = sessionStorage.getItem("authToken"); // Retrieve the token
+
+      if (!token) {
+        console.error("Authentication token is missing.");
+        return;
+      }
+
       try {
-        const response = await fetch(`http://localhost:8000/api/doctor/${doctorId}/`);
+        const response = await fetch(
+          `${domain_name}/api/appointments/doctors/${doctorId}/`,
+          {
+            method: "GET",
+            headers: {
+              Authorization: `Bearer ${token}`, // Add the token to the Authorization header
+              "Content-Type": "application/json",
+            },
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error(`HTTP error! status: ${response.status}`);
+        }
+
         const data = await response.json();
         setDoctorNames((prevNames) => ({
           ...prevNames,
@@ -83,14 +129,18 @@ function AppointmentTableData({ appointments }: { appointments: Appointment[] })
               getDoctorNameById(appointment.assigned_doctor);
 
               return (
-                <TableRow key={index} style={{ textDecoration: "none", color: "inherit" }}>
+                <TableRow
+                  key={index}
+                  style={{ textDecoration: "none", color: "inherit" }}
+                >
                   <TableCell align="center">{appointment.id}</TableCell>
                   <TableCell>{appointment.full_name}</TableCell>
                   <TableCell>{appointment.gender}</TableCell>
                   <TableCell>{appointment.phone}</TableCell>
                   <TableCell>{appointment.age}</TableCell>
                   <TableCell>
-                    {doctorNames[appointment.referred_by_doctor] || "Loading..."}
+                    {doctorNames[appointment.referred_by_doctor] ||
+                      "Loading..."}
                   </TableCell>
                   <TableCell>{appointment.appointment_date}</TableCell>
                   <TableCell>
@@ -100,7 +150,9 @@ function AppointmentTableData({ appointments }: { appointments: Appointment[] })
                     <Chip
                       label={appointment.status}
                       variant="outlined"
-                      color={appointment.status === "open" ? "success" : "error"}
+                      color={
+                        appointment.status === "open" ? "success" : "error"
+                      }
                       sx={{ textTransform: "uppercase" }}
                     />
                   </TableCell>

@@ -70,8 +70,9 @@ export default function AppointmentDialog({
     // Fetch the list of doctors from the backend
     const fetchDoctors = async () => {
       setLoading(true);
+
       try {
-        const response = await axios.get('http://localhost:8000/api/appointments/doctors/');  // Adjust the API endpoint accordingly
+        const response = await axios.get(`${domain_name}/api/appointments/doctors/`);  // Adjust the API endpoint accordingly
         setDoctors(response.data);  // Assuming the response returns an array of doctors
         console.log(response.data);
       } catch (error) {
@@ -84,7 +85,7 @@ export default function AppointmentDialog({
     fetchDoctors();
   }, []);
 
-
+  const domain_name = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
 
   React.useEffect(() => {
@@ -92,7 +93,7 @@ export default function AppointmentDialog({
       const token = sessionStorage.getItem("authToken");
       try {
         const response = await fetch(
-          "http://localhost:8000/api/auth/get-user/",
+          `${domain_name}/api/auth/get-user/`,
           {
             method: "GET",
             headers: {
@@ -148,7 +149,7 @@ export default function AppointmentDialog({
     try {
       // POST the complete data to the backend
       await axios.post(
-        "http://localhost:8000/api/appointments/create/",
+        `${domain_name}/api/appointments/create/`,
         completeData,
         {
           headers: {

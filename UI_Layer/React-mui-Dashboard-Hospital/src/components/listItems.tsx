@@ -84,13 +84,14 @@ export const secondaryNavList = [
         }
     
         // Send a POST request to logout with only the Authorization header
-        const response = await fetch("http://localhost:8000/api/auth/logout/", {
+        const domain_name = process.env.REACT_APP_API_URL || 'http://localhost:8000'; // Define your domain name here
+        const response = await fetch(`${domain_name}/api/auth/logout/`, {
           method: "POST",
           headers: {
             "Authorization": `Bearer ${token}`, // Add token to the header
             "Content-Type": "application/json",  // Ensure content type is set to JSON if required
           },
-          body: JSON.stringify({refresh: sessionStorage.getItem('refreshToken')})  // Send an empty body if the API expects it
+          body: JSON.stringify({ refresh: sessionStorage.getItem('refreshToken') })  // Send an empty body if the API expects it
         });
     
         if (!response.ok) {

@@ -219,11 +219,11 @@ export default function SignInSide() {
     formState: { errors },
   } = useForm<FormValues>();
 
-  const domain_name = "http://localhost";
+  const domain_name = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
   const onSubmit = async (data: FormValues) => {
     try {
-      const response = await axios.post(`${domain_name}:8000/api/auth/token/`, {
+      const response = await axios.post(`${domain_name}/api/auth/token/`, {
         email: data.email,
         password: data.password,
       });
@@ -243,18 +243,19 @@ export default function SignInSide() {
 
       // Step 2: Verify token
       const verifyResponse = await axios.post(
-        `${domain_name}:8000/api/auth/token/verify/`,
+        `${domain_name}/api/auth/token/verify/`,
         { token: access },
         {
           headers: {
-            Authorization: `Bearer ${access}`, // Ensure token is sent properly in the header
+            Authorization: `Bearer ${access}`, 
           },
         }
       );
 
+
       // Step 3: Fetch user details
       const userResponse = await axios.get(
-        `${domain_name}:8000/api/auth/get-user/`,
+        `${domain_name}/api/auth/get-user/`,
         {
           headers: {
             Authorization: `Bearer ${access}`,

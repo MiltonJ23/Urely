@@ -100,20 +100,20 @@ export default function General() {
     formData.append("profile", file);
 
     // Example of an API call
-    fetch("http://localhost:8000/api/upload-profile/", {
+    fetch(`${domain_name}/api/upload-profile/`, {
       method: "POST",
       body: formData,
     })
       .then((response) => {
-        if (response.ok) {
-          alert("Profile uploaded successfully!");
-        } else {
-          alert("Failed to upload profile.");
-        }
+      if (response.ok) {
+        alert("Profile uploaded successfully!");
+      } else {
+        alert("Failed to upload profile.");
+      }
       })
       .catch((error) => {
-        console.error("Upload error:", error);
-        alert("An error occurred during upload.");
+      console.error("Upload error:", error);
+      alert("An error occurred during upload.");
       });
   };
 

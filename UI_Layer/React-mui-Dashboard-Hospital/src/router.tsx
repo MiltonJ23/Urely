@@ -41,6 +41,8 @@ const AdminElement = ({ children }: any) => {
   }
 };
 
+const domain_name = process.env.REACT_APP_API_URL || 'http://localhost:8000';
+
 const ProtectedRoute = ({ children }: any) => {
   const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null); // null indicates loading state
   const authToken = sessionStorage.getItem("authToken");
@@ -53,7 +55,7 @@ const ProtectedRoute = ({ children }: any) => {
       }
 
       try {
-        const response = await fetch("http://localhost:8000/api/auth/token/verify/", {
+        const response = await fetch(`${domain_name}/api/auth/token/verify/`, {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

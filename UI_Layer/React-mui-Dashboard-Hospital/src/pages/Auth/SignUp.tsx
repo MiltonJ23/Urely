@@ -31,11 +31,11 @@ export default function SignUp() {
 
   const navigate = useNavigate();
 
-  const domain_name = "http://localhost";
+  const domain_name = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
   const onSubmit = async (data: FormValues) => {
     try {
-      const response = await axios.post(`${domain_name}:8000/api/auth/register/`, {
+      const response = await axios.post(`${domain_name}/api/auth/register/`, {
         first_name: data.firstName,
         last_name: data.lastName,
         email: data.email,

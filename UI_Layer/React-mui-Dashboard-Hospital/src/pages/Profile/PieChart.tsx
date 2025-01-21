@@ -16,8 +16,7 @@ export default function PieChart() {
   // Fetch data from the backend
   useEffect(() => {
     const fetchChartData = async () => {
-      const domain_name = "http://localhost"; // Backend URL
-      
+      const domain_name = process.env.REACT_APP_BACKEND_URL || "http://localhost";
       try {
         const response = await fetch(`${domain_name}:8000/api/appointments/statistics/`);
         if (!response.ok) {

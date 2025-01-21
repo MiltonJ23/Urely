@@ -11,11 +11,12 @@ import apiClient from "../../components/ApiClient";
 
 function Appointments() {
   const [appointments, setAppointments] = useState([]);
+  const domain_name = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
   const fetchAppointments = async () => {
     try {
       const token = sessionStorage.getItem("authToken");
-      const response = await axios.get("http://localhost:8000/api/appointments/", {
+      const response = await axios.get(`${domain_name}/api/appointments/`, {
         headers: {
           Authorization: `Bearer ${token}`,
         },

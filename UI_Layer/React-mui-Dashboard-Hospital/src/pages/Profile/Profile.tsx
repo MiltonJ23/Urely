@@ -46,14 +46,14 @@ export default function Profile() {
 
   // Function to fetch profile data
   const fetchProfileData = async () => {
-    const domain_name = "http://localhost";
+    const domain_name = process.env.REACT_APP_API_URL || "http://localhost:8000";
 
     setLoading(true);
     setError(null);
 
     try {
       const response = await fetch(
-        `${domain_name}:8000/api/appointments/doctors/`
+        `${domain_name}/api/appointments/doctors/`
       );
 
       if (!response.ok) {

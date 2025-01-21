@@ -7,7 +7,7 @@ function GoogleLoginButton() {
   const login = useGoogleLogin({
     onSuccess: async (tokenResponse) => {
       try {
-        const res = await axios.post("http://localhost:8000/auth/google/", {
+        const res = await axios.post(`${process.env.REACT_APP_API_URL}/auth/google/`, {
           access_token: tokenResponse.access_token, // Send token to Django backend
         });
 

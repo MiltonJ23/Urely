@@ -36,6 +36,8 @@ export default function Appbar(props: { appBarTitle: string }) {
     setAnchorElUser(event.currentTarget);
   };
 
+  const domain_name = process.env.REACT_APP_API_URL || 'http://localhost:8000'
+
   const handleCloseUserMenu = () => {
     setAnchorElUser(null);
   };
@@ -43,7 +45,7 @@ export default function Appbar(props: { appBarTitle: string }) {
   React.useEffect(() => {
     const fetchUser = async () => {
       const token = sessionStorage.getItem("authToken");
-      const response = await fetch("http://localhost:8000/api/auth/get-user/", {
+      const response = await fetch(`${domain_name}/api/auth/get-user/`, {
         method: "GET",
         headers: {
           Authorization: `Bearer ${token}`,

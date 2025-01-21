@@ -307,6 +307,7 @@ class MarkCheckedInView(APIView):
 
 
 @api_view(['GET'])
+@permission_classes([AllowAny])
 def get_doctor_by_id(request, doctor_id):
     """
     Get doctor details by ID.

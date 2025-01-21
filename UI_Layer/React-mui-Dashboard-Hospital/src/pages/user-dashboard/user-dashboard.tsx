@@ -188,7 +188,7 @@ const UserDashboard: React.FC = () => {
         return;
       }
 
-      const domain_name = "http://localhost:8000"; // Update with your backend URL
+      const domain_name = process.env.REACT_APP_BACKEND_URL || "http://localhost:8000"; // Update with your backend URL
 
       try {
         const response = await axios.get(
