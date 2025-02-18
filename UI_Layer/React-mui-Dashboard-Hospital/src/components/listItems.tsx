@@ -19,11 +19,22 @@ import BookOnlineIcon from "@mui/icons-material/BookOnline";
 import SickIcon from "@mui/icons-material/Sick";
 import ViewKanbanIcon from "@mui/icons-material/ViewKanban";
 import ManageAccountsIcon from "@mui/icons-material/ManageAccounts";
+import InsertChartIcon from '@mui/icons-material/InsertChart';
 
 const primarynavList = [
   {
     link: "/dashboard",
     label: "Dashboard",
+    icon: <DashboardIcon />,
+  },
+  {
+    link: "/activity-logs",
+    label: "Activity Logs",
+    icon: <InsertChartIcon />,
+  },
+  {
+    link: "/user-dashboard",
+    label: "User Dashboard",
     icon: <DashboardIcon />,
   },
   {
@@ -51,11 +62,11 @@ const primarynavList = [
     label: "Calender",
     icon: <CalendarMonthIcon />,
   },
-  {
-    link: "/kanban",
-    label: "Kanban",
-    icon: <ViewKanbanIcon />,
-  },
+  // {
+  //   link: "/kanban",
+  //   label: "Kanban",
+  //   icon: <ViewKanbanIcon />,
+  // },
   {
     link: "/account",
     label: "Account",

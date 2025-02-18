@@ -27,7 +27,32 @@ export default function SignUp() {
     formState: { errors },
     control
   } = useForm<FormValues>();
-  const onSubmit = (data: FormValues) => console.log(data);
+
+  const onSubmit = async (data: FormValues) => {
+    try {
+      const response = await fetch("http://localhost:5000/api/auth/register", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(data),
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json();
+        console.error("Registration failed:", errorData.message);
+        alert(`Registration failed: ${errorData.message}`);
+        return;
+      }
+
+      const responseData = await response.json();
+      console.log("Registration successful:", responseData);
+      alert("Registration successful! Please log in.");
+    } catch (error) {
+      console.error("Error during registration:", error);
+      alert("An error occurred while registering. Please try again.");
+    }
+  };
 
   return (
     <Container component="main" maxWidth="xs" sx={{ height: "80vh" }}>
@@ -36,7 +61,7 @@ export default function SignUp() {
           marginTop: 8,
           display: "flex",
           flexDirection: "column",
-          alignItems: "center"
+          alignItems: "center",
         }}
       >
         <Avatar sx={{ m: 1, bgcolor: "secondary.main" }}>
@@ -50,15 +75,11 @@ export default function SignUp() {
             <Grid container spacing={2}>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  //autoComplete="given-name"
-                  //name="firstName"
-                  //required
                   fullWidth
                   id="firstName"
                   label="First Name"
-                  //autoFocus
                   {...register("firstName", {
-                    required: "First Name is required"
+                    required: "First Name is required",
                   })}
                   error={!!errors.firstName}
                   helperText={errors.firstName?.message}
@@ -66,14 +87,11 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12} sm={6}>
                 <TextField
-                  //required
                   fullWidth
                   id="lastName"
                   label="Last Name"
-                  //name="lastName"
-                  //autoComplete="family-name"
                   {...register("lastName", {
-                    required: "Last Name is required"
+                    required: "Last Name is required",
                   })}
                   error={!!errors.lastName}
                   helperText={errors.lastName?.message}
@@ -81,14 +99,11 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  //required
                   fullWidth
                   id="email"
                   label="Email Address"
-                  //name="email"
-                  //autoComplete="email"
                   {...register("email", {
-                    required: "Email is required"
+                    required: "Email is required",
                   })}
                   error={!!errors.email}
                   helperText={errors.email?.message}
@@ -96,15 +111,12 @@ export default function SignUp() {
               </Grid>
               <Grid item xs={12}>
                 <TextField
-                  //required
                   fullWidth
-                  //name="password"
                   label="Password"
                   type="password"
                   id="password"
-                  //autoComplete="new-password"
                   {...register("password", {
-                    required: "Password is required"
+                    required: "Password is required",
                   })}
                   error={!!errors.password}
                   helperText={errors.password?.message}
@@ -133,7 +145,7 @@ export default function SignUp() {
                   to={"/login"}
                   style={{
                     textDecoration: "none",
-                    color: "inherit"
+                    color: "inherit",
                   }}
                 >
                   Already have an account? Sign in

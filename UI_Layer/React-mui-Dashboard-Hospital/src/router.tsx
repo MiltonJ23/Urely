@@ -16,19 +16,38 @@ import Kanban from "./pages/Kanban/Kanban";
 import Account from "./pages/Account/Account";
 import Settings from "./pages/Settings/Settings";
 import { mockPatientData } from "./mockData";
+import PatientForm from "./pages/Form/Form";
+import LabResultsTableData from "./pages/Lab_Results/Result";
+import MedicalRecord from "./pages/Medical_Record/Medical_Record";
+import Prescription from "./pages/Prescribtion/Prescribtion";
+import CarePlan from "./pages/Care_Plan/Careplan";
+import Help from "./pages/Help/Help";
+import UserDashboard from "../src/pages/user-dashboard/user-dashboarduser-dashboarduser-dashboard";
+import ActivityLogs from "./pages/ActivityLogs/ActivityLogs";
 
 const USER_TYPES = {
   NORMAL_USER: "Normal User",
-  ADMIN_USER: "Admin User"
+  ADMIN_USER: "Admin User",
 };
 
-const CURRENT_USER_TYPE = USER_TYPES.ADMIN_USER;
+const CURRENT_USER_TYPE = USER_TYPES.NORMAL_USER;
 
 const AdminElement = ({ children }: any) => {
   if (CURRENT_USER_TYPE === USER_TYPES.ADMIN_USER) {
     return <>{children}</>;
   } else {
-    return <Navigate to={"/"} />;
+    return <Navigate to="/unauthorized" />;
+  }
+};
+
+const ProtectedRoute = ({ children }: any) => {
+  if (
+    CURRENT_USER_TYPE === USER_TYPES.ADMIN_USER ||
+    CURRENT_USER_TYPE === USER_TYPES.NORMAL_USER
+  ) {
+    return <>{children}</>;
+  } else {
+    return <Navigate to="/" />;
   }
 };
 
@@ -36,25 +55,49 @@ export const router = createBrowserRouter([
   {
     path: "/",
     element: <SignInSide />,
-    errorElement: <ErrorPage />
+    errorElement: <ErrorPage />,
   },
   {
     path: "/login",
-    element: <SignInSide />
+    element: <SignInSide />,
   },
   {
     path: "/signup",
-    element: <SignUp />
+    element: <SignUp />,
   },
   {
     path: "/forgot",
-    element: <ForgotPassword />
+    element: <ForgotPassword />,
   },
   {
     path: "/dashboard",
     element: (
-      <AdminElement>
+      <ProtectedRoute>
         <Dashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/user-dashboard",
+    element: (
+      <ProtectedRoute>
+        <UserDashboard />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/activity-logs",
+    element: (
+      <ProtectedRoute>
+        <ActivityLogs />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/activity-logs",
+    element: (
+      <AdminElement>
+        <ActivityLogs />
       </AdminElement>
     )
   },
@@ -64,15 +107,15 @@ export const router = createBrowserRouter([
       <AdminElement>
         <AllOrders />
       </AdminElement>
-    )
+    ),
   },
   {
     path: "/profile",
     element: (
-      <AdminElement>
+      <ProtectedRoute>
         <Profile />
-      </AdminElement>
-    )
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/patient-info/:id",
@@ -80,7 +123,7 @@ export const router = createBrowserRouter([
       <AdminElement>
         <PatientInfo patients={mockPatientData} />
       </AdminElement>
-    )
+    ),
   },
   {
     path: "/patient-list",
@@ -88,7 +131,7 @@ export const router = createBrowserRouter([
       <AdminElement>
         <PatientList data={mockPatientData} />
       </AdminElement>
-    )
+    ),
   },
   {
     path: "/doctor-list",
@@ -96,39 +139,87 @@ export const router = createBrowserRouter([
       <AdminElement>
         <DoctorList />
       </AdminElement>
-    )
+    ),
   },
   {
     path: "/appointments",
     element: (
-      <AdminElement>
+      <ProtectedRoute>
         <Appointments />
-      </AdminElement>
-    )
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/calender",
     element: (
-      <AdminElement>
+      <ProtectedRoute>
         <Calender />
-      </AdminElement>
-    )
+      </ProtectedRoute>
+    ),
   },
   {
-    path: "/kanban",
+    path: "/forms",
     element: (
-      <AdminElement>
-        <Kanban />
-      </AdminElement>
-    )
+      <ProtectedRoute>
+        <PatientForm />
+      </ProtectedRoute>
+    ),
   },
+  {
+    path: "/lab-results",
+    element: (
+      <ProtectedRoute>
+        <LabResultsTableData />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/medical-records",
+    element: (
+      <ProtectedRoute>
+        <MedicalRecord />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/prescriptions",
+    element: (
+      <ProtectedRoute>
+        <Prescription />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/plans",
+    element: (
+      <ProtectedRoute>
+        <CarePlan />
+      </ProtectedRoute>
+    ),
+  },
+  {
+    path: "/help",
+    element: (
+      <ProtectedRoute>
+        <Help />
+      </ProtectedRoute>
+    ),
+  },
+  // {
+  //   path: "/kanban",
+  //   element: (
+  //     <AdminElement>
+  //       <Kanban />
+  //     </AdminElement>
+  //   ),
+  // },
   {
     path: "/account",
     element: (
-      <AdminElement>
+      <ProtectedRoute>
         <Account />
-      </AdminElement>
-    )
+      </ProtectedRoute>
+    ),
   },
   {
     path: "/settings",
@@ -136,6 +227,128 @@ export const router = createBrowserRouter([
       <AdminElement>
         <Settings />
       </AdminElement>
-    )
-  }
+    ),
+  },
+  // {
+  //   path: "/unauthorized",
+  //   element: (
+  //     <ErrorPage message="Unauthorized: You do not have access to this page." />
+  //   ),
+  // },
 ]);
+
+// const AdminElement = ({ children }: any) => {
+//   if (CURRENT_USER_TYPE === USER_TYPES.ADMIN_USER) {
+//     return <>{children}</>;
+//   } else {
+//     return <Navigate to={"/"} />;
+//   }
+// };
+
+// export const router = createBrowserRouter([
+//   {
+//     path: "/",
+//     element: <SignInSide />,
+//     errorElement: <ErrorPage />,
+//   },
+//   {
+//     path: "/login",
+//     element: <SignInSide />,
+//   },
+//   {
+//     path: "/signup",
+//     element: <SignUp />,
+//   },
+//   {
+//     path: "/forgot",
+//     element: <ForgotPassword />,
+//   },
+//   {
+//     path: "/dashboard",
+//     element: (
+//       <AdminElement>
+//         <Dashboard />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/orders",
+//     element: (
+//       <AdminElement>
+//         <AllOrders />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/profile",
+//     element: (
+//       <AdminElement>
+//         <Profile />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/patient-info/:id",
+//     element: (
+//       <AdminElement>
+//         <PatientInfo patients={mockPatientData} />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/patient-list",
+//     element: (
+//       <AdminElement>
+//         <PatientList data={mockPatientData} />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/doctor-list",
+//     element: (
+//       <AdminElement>
+//         <DoctorList />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/appointments",
+//     element: (
+//       <AdminElement>
+//         <Appointments />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/calender",
+//     element: (
+//       <AdminElement>
+//         <Calender />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/kanban",
+//     element: (
+//       <AdminElement>
+//         <Kanban />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/account",
+//     element: (
+//       <AdminElement>
+//         <Account />
+//       </AdminElement>
+//     ),
+//   },
+//   {
+//     path: "/settings",
+//     element: (
+//       <AdminElement>
+//         <Settings />
+//       </AdminElement>
+//     ),
+//   },
+// ]);

@@ -1,5 +1,5 @@
 from rest_framework import serializers
-from .models import WaterIntake, PhysicalActivity
+from .models import WaterIntake, PhysicalActivity, ActivityLog
 
 class WaterIntakeSerializer(serializers.ModelSerializer):
     class Meta:
@@ -20,3 +20,17 @@ class PhysicalActivitySerializer(serializers.ModelSerializer):
         if value <= 0:
             raise serializers.ValidationError("Duration must be greater than zero.")
         return value
+
+
+class ActivityLogSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = ActivityLog
+        fields = ['user', 'date', 'water_intake', 'exercise_duration', 'medication_count', 'food_intake']
+
+class ActivityLogViewSet(viewsets.ModelViewSet):
+    queryset = ActivityLog.objects.all()
+    serializer_class = ActivityLogSerializer
+
+    def get_queryset(self):
+        user = self.request.user
+        return ActivityLog.objects.filter(user=user).order_by('-date')
